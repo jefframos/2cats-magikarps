@@ -27,11 +27,16 @@ var Ball = Entity.extend({
 	},
 	build: function(){
 
-		this.spriteBall = new PIXI.Sprite.fromFrame(this.imgSource);
+
+		// this.spriteBall = new PIXI.Sprite.fromFrame(this.imgSource);
+		this.spriteBall = new PIXI.Graphics();
+		this.spriteBall.beginFill(0xFFFFFF);
+		this.spriteBall.drawCircle(0,0,windowHeight * 0.05);
+
 		this.sprite = new PIXI.Sprite();
         this.sprite.addChild(this.spriteBall);
-        this.spriteBall.anchor.x = 0.5;
-		this.spriteBall.anchor.y = 0.5;
+  //       this.spriteBall.anchor.x = 0.5;
+		// this.spriteBall.anchor.y = 0.5;
 
 		this.sprite.anchor.x = 0.5;
 		this.sprite.anchor.y = 0.5;
@@ -60,6 +65,7 @@ var Ball = Entity.extend({
         this.gravityVal = 0.3;
         this.breakJump = false;
         this.blockCollide = false;
+        this.inError = false;
 
         this.perfectShoot = 0;
         this.perfectShootAcum = 0;
@@ -88,7 +94,7 @@ var Ball = Entity.extend({
 		if(!this.blockCollide){
 			this.layer.collideChilds(this);
 		}
-		this.range = this.spriteBall.height / 4;
+		this.range = this.spriteBall.height / 2;
 
 		// console.log(this.getContent().position.y , this.velocity.y , this.floorPos);
 		if(this.getContent().position.y + this.velocity.y >= this.floorPos){
@@ -97,6 +103,7 @@ var Ball = Entity.extend({
 			this.getContent().position.y = this.floorPos;
 			this.breakJump = false;
 			this.blockCollide = false;
+			this.inError = false;
 		}else{
 			this.velocity.y += this.gravityVal;
 			this.breakJump = true;
@@ -209,7 +216,7 @@ var Ball = Entity.extend({
 	charge:function(){
 		var angle = degreesToRadians(Math.random() * 360);
 		// var angle = degreesToRadians(60);
-		var dist = this.spriteBall.height * 0.7;
+		var dist = this.spriteBall.height * 0.9;
 		var pPos = {x:dist * Math.sin(angle)+ this.getContent().position.x, y:dist * Math.cos(angle)+ this.getContent().position.y};
 		// var pPos = {x:this.getPosition().x, y:this.getPosition().y};
 
@@ -217,7 +224,11 @@ var Ball = Entity.extend({
 		var vector = Math.atan2(this.getPosition().x - pPos.x, this.getPosition().y - pPos.y);
 		var vel = 2;
 		var vecVel = {x: Math.sin(vector) * vel, y: Math.cos(vector) * vel};
-		var particle = new Particles(vecVel, 800, this.particleSource, 0);
+
+		var tempPart = new PIXI.Graphics();
+		tempPart.beginFill(0xFFFFFF);
+		tempPart.drawCircle(0,0,windowHeight * 0.05);
+		var particle = new Particles(vecVel, 800, tempPart, 0);
         particle.maxScale = this.getContent().scale.x / 3;
         // particle.maxInitScale = particle.maxScale / 1.5;
         // particle.growType = -1;

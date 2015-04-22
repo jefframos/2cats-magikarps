@@ -32,14 +32,14 @@ var Particles = Entity.extend({
     },
     build: function(){
         this.updateable = true;
-        if(this.imgSource instanceof PIXI.Text)
+        if(this.imgSource instanceof PIXI.Text || this.imgSource instanceof PIXI.Graphics)
         {
             this.sprite = this.imgSource;
         }else{
             this.sprite = new PIXI.Sprite.fromFrame(this.imgSource);
+            this.sprite.anchor.x = 0.5;
+            this.sprite.anchor.y = 0.5;
         }
-        this.sprite.anchor.x = 0.5;
-        this.sprite.anchor.y = 0.5;
         this.sprite.alpha = 1;
         this.sprite.scale.x = this.maxScale * this.maxInitScale;
         this.sprite.scale.y = this.maxScale * this.maxInitScale;

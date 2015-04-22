@@ -320,7 +320,7 @@ SmartSocket.SOCKET_ERROR = "socketError";
 var Application = AbstractApplication.extend({
     init: function() {
         function initialize() {
-            self._super(windowWidth, windowHeight), self.stage.setBackgroundColor(14370108), 
+            self._super(windowWidth, windowHeight), self.stage.setBackgroundColor(4533865), 
             self.stage.removeChild(self.loadText), self.labelDebug = new PIXI.Text("", {
                 font: "15px Arial"
             }), self.labelDebug.position.y = windowHeight - 20, self.labelDebug.position.x = 20, 
@@ -755,15 +755,15 @@ var Application = AbstractApplication.extend({
         });
     },
     build: function() {
-        this.spriteBall = new PIXI.Sprite.fromFrame(this.imgSource), this.sprite = new PIXI.Sprite(), 
-        this.sprite.addChild(this.spriteBall), this.spriteBall.anchor.x = .5, this.spriteBall.anchor.y = .5, 
-        this.sprite.anchor.x = .5, this.sprite.anchor.y = .5, this.updateable = !0, this.collidable = !0, 
-        this.getContent().alpha = .1, TweenLite.to(this.getContent(), .3, {
+        this.spriteBall = new PIXI.Graphics(), this.spriteBall.beginFill(16777215), this.spriteBall.drawCircle(0, 0, .05 * windowHeight), 
+        this.sprite = new PIXI.Sprite(), this.sprite.addChild(this.spriteBall), this.sprite.anchor.x = .5, 
+        this.sprite.anchor.y = .5, this.updateable = !0, this.collidable = !0, this.getContent().alpha = .1, 
+        TweenLite.to(this.getContent(), .3, {
             alpha: 1
         }), this.collideArea = new PIXI.Rectangle(-50, -50, windowWidth + 100, windowHeight + 100), 
         this.particlesCounterMax = 2, this.particlesCounter = 1, this.floorPos = windowHeight, 
         this.gravity = 0, this.gravityVal = .3, this.breakJump = !1, this.blockCollide = !1, 
-        this.perfectShoot = 0, this.perfectShootAcum = 0;
+        this.inError = !1, this.perfectShoot = 0, this.perfectShootAcum = 0;
     },
     setFloor: function(pos) {
         this.floorPos = pos;
@@ -783,11 +783,11 @@ var Application = AbstractApplication.extend({
         return this.breakJump ? void this.screen.miss() : (this.gravity = 0, void (this.velocity.y = -force));
     },
     update: function() {
-        this._super(), this.blockCollide || this.layer.collideChilds(this), this.range = this.spriteBall.height / 4, 
+        this._super(), this.blockCollide || this.layer.collideChilds(this), this.range = this.spriteBall.height / 2, 
         this.getContent().position.y + this.velocity.y >= this.floorPos ? (this.velocity.y = 0, 
         this.gravity = 0, this.getContent().position.y = this.floorPos, this.breakJump = !1, 
-        this.blockCollide = !1) : (this.velocity.y += this.gravityVal, this.breakJump = !0), 
-        0 !== this.velocity.y ? this.updateableParticles() : this.perfectShoot++;
+        this.blockCollide = !1, this.inError = !1) : (this.velocity.y += this.gravityVal, 
+        this.breakJump = !0), 0 !== this.velocity.y ? this.updateableParticles() : this.perfectShoot++;
     },
     updateableParticles: function() {
         if (this.particlesCounter--, this.particlesCounter <= 0) {
@@ -824,13 +824,15 @@ var Application = AbstractApplication.extend({
         }
     },
     charge: function() {
-        var angle = degreesToRadians(360 * Math.random()), dist = .7 * this.spriteBall.height, pPos = {
+        var angle = degreesToRadians(360 * Math.random()), dist = .9 * this.spriteBall.height, pPos = {
             x: dist * Math.sin(angle) + this.getContent().position.x,
             y: dist * Math.cos(angle) + this.getContent().position.y
         }, vector = Math.atan2(this.getPosition().x - pPos.x, this.getPosition().y - pPos.y), vel = 2, vecVel = {
             x: Math.sin(vector) * vel,
             y: Math.cos(vector) * vel
-        }, particle = new Particles(vecVel, 800, this.particleSource, 0);
+        }, tempPart = new PIXI.Graphics();
+        tempPart.beginFill(16777215), tempPart.drawCircle(0, 0, .05 * windowHeight);
+        var particle = new Particles(vecVel, 800, tempPart, 0);
         particle.maxScale = this.getContent().scale.x / 3, particle.build(), particle.gravity = 0, 
         particle.scaledecress = -.01, particle.setPosition(pPos.x, pPos.y), this.layer.addChild(particle), 
         particle.getContent().parent.setChildIndex(particle.getContent(), 0);
@@ -865,15 +867,17 @@ var Application = AbstractApplication.extend({
         });
     },
     build: function() {
-        this.sprite = new PIXI.Sprite.fromFrame(this.imgSource), this.sprite.anchor.x = .5, 
-        this.sprite.anchor.y = .5, this.updateable = !0, this.collidable = !0, this.getContent().alpha = .5, 
-        TweenLite.to(this.getContent(), .3, {
+        this.spriteBall = new PIXI.Graphics(), this.spriteBall.beginFill(16777215);
+        var size = .05 * windowHeight;
+        this.spriteBall.drawRect(-size / 2, -size / 2, size, size), this.sprite = new PIXI.Sprite(), 
+        this.sprite.addChild(this.spriteBall), this.updateable = !0, this.collidable = !0, 
+        this.getContent().alpha = .5, TweenLite.to(this.getContent(), .3, {
             alpha: 1
         }), this.collideArea = new PIXI.Rectangle(-50, -50, windowWidth + 100, windowHeight + 100), 
         this.particlesCounterMax = 5, this.particlesCounter = 5;
     },
     update: function() {
-        this.range = this.sprite.height / 2.5, this._super();
+        this.range = this.spriteBall.width / 2, this._super();
     },
     preKill: function() {
         if (!this.invencible) {
@@ -2054,27 +2058,30 @@ var Application = AbstractApplication.extend({
             self.pauseModal.show();
         }, function() {
             self.pauseModal.hide();
-        }), this.layerManager = new LayerManager(), this.layerManager.build("Main"), this.addChild(this.layerManager), 
+        }), this.brilhoBase = new SimpleSprite("baseDegrade.png"), this.container.addChild(this.brilhoBase.getContent()), 
+        scaleConverter(this.brilhoBase.getContent().width, windowWidth, 1, this.brilhoBase), 
+        this.brilhoBase.getContent().position.x = windowWidth / 2 - this.brilhoBase.getContent().width / 2, 
+        this.layerManager = new LayerManager(), this.layerManager.build("Main"), this.addChild(this.layerManager), 
         this.layer = new Layer(), this.layer.build("EntityLayer"), this.layerManager.addLayer(this.layer), 
+        this.coinsLabel = new PIXI.Text("0", {
+            align: "center",
+            font: "80px Vagron",
+            fill: "#5E4487",
+            wordWrap: !0,
+            wordWrapWidth: 500
+        }), scaleConverter(this.coinsLabel.height, windowHeight, .2, this.coinsLabel), this.addChild(this.coinsLabel), 
         this.tapToPlay = new PIXI.Text("TAP AND HOLD TO PLAY", {
             align: "center",
             font: "30px Vagron",
-            fill: "#FFF",
+            fill: "#5E4487",
             wordWrap: !0,
             wordWrapWidth: 500
         }), scaleConverter(this.tapToPlay.height, windowHeight, .06, this.tapToPlay), this.tapToPlay.alpha = 0, 
-        this.tapToPlay.position.y = windowHeight / 2, this.tapToPlay.position.x = windowWidth / 2 - this.tapToPlay.width / 2, 
-        this.addChild(this.tapToPlay), this.initLevel(), this.coinsLabel = new PIXI.Text("0", {
-            align: "center",
-            font: "30px Vagron",
-            fill: "#f5c30c",
-            wordWrap: !0,
-            wordWrapWidth: 500
-        }), scaleConverter(this.coinsLabel.height, windowHeight, .06, this.coinsLabel), 
-        this.addChild(this.coinsLabel), this.updateCoins(), this.loaderBar = new LifeBarHUD(.6 * windowWidth, 20, 0, 16106252, 16729404), 
+        this.tapToPlay.position.y = windowHeight / 1.1, this.tapToPlay.position.x = windowWidth / 2 - this.tapToPlay.width / 2, 
+        this.addChild(this.tapToPlay), this.loaderBar = new LifeBarHUD(.6 * windowWidth, 20, 0, 16106252, 16729404), 
         this.addChild(this.loaderBar.getContent()), this.loaderBar.getContent().position.x = windowWidth / 2 - this.loaderBar.getContent().width / 2, 
         this.loaderBar.getContent().position.y = windowHeight / 1.1, this.loaderBar.updateBar(0, 100), 
-        this.startLevel = !1;
+        this.loaderBar.getContent().alpha = 0, this.initLevel(), this.startLevel = !1;
     },
     miss: function() {
         var errou = new Particles({
@@ -2086,19 +2093,24 @@ var Application = AbstractApplication.extend({
         }));
         errou.maxScale = this.player.getContent().scale.x, errou.build(), errou.gravity = -.2, 
         errou.alphadecress = .04, errou.scaledecress = .05, errou.setPosition(this.player.getPosition().x, this.player.getPosition().y), 
-        this.layer.addChild(errou), this.levelCounter -= .05 * this.levelCounterMax, this.levelCounter < 0 && (this.levelCounter = 0);
+        this.layer.addChild(errou), this.player.inError = !0, this.levelCounter -= .1 * this.levelCounterMax, 
+        this.levelCounter < 0 && (this.levelCounter = 0);
     },
     shoot: function(force) {
-        this.startLevel = !0, this.player.jump(force), this.force = 0, 0 !== this.tapToPlay.alpha && TweenLite.to(this.tapToPlay, .5, {
+        this.player.inError || (this.startLevel = !0, this.player.jump(force), this.force = 0, 
+        0 !== this.tapToPlay.alpha && (TweenLite.to(this.tapToPlay, .2, {
             alpha: 0
-        });
+        }), TweenLite.to(this.loaderBar.getContent(), .2, {
+            delay: .2,
+            alpha: 1
+        })));
     },
     reset: function() {
         this.destroy(), this.build();
     },
     update: function() {
-        this.updateable && (this.tapDown && this.force < 16 && (this.force += .75, this.player.charge()), 
-        this.startLevel && (this.levelCounter--, this.levelCounter < 0 && (this.levelCounter = 0)), 
+        this.updateable && (this.player.inError || (this.tapDown && this.force < 16 && (this.force += .75, 
+        this.player.charge()), this.startLevel && (this.levelCounter--, this.levelCounter < 0 && (this.levelCounter = 0))), 
         this.levelCounter <= 0 && this.gameOver(), this.loaderBar.updateBar(this.levelCounter, this.levelCounterMax), 
         this._super());
     },
@@ -2122,22 +2134,25 @@ var Application = AbstractApplication.extend({
         this.updateCoins();
     },
     updateCoins: function() {
-        this.coinsLabel.setText(APP.points), this.coinsLabel.position.x = .1 * windowWidth, 
-        this.coinsLabel.position.y = .1 * windowWidth;
+        this.coinsLabel.setText(APP.points), this.coinsLabel.position.x = windowWidth / 2 - this.coinsLabel.width / 2, 
+        this.coinsLabel.position.y = windowHeight / 2 - this.coinsLabel.height / 2, this.coinsLabel.parent.setChildIndex(this.coinsLabel, 0);
     },
     initLevel: function(whereInit) {
         this.player = new Ball({
             x: 0,
             y: 0
         }, this), this.player.build(), this.layer.addChild(this.player), this.player.getContent().position.x = windowWidth / 2, 
-        this.player.getContent().position.y = windowHeight / 1.2, this.player.setFloor(windowHeight / 1.2), 
+        this.player.getContent().position.y = windowHeight / 1.2;
+        var base = windowHeight / 1.2;
+        this.player.setFloor(base), this.brilhoBase.getContent().position.y = base + this.player.spriteBall.height / 2, 
         this.targetJump = new Coin({
             x: 0,
             y: 0
         }), this.targetJump.build(), this.layer.addChild(this.targetJump), this.targetJump.getContent().position.x = windowWidth / 2, 
         this.targetJump.getContent().position.y = .2 * windowHeight, TweenLite.to(this.tapToPlay, .5, {
             alpha: 1
-        }), this.force = 0, this.levelCounter = 800, this.levelCounterMax = 800, APP.points = 0;
+        }), this.force = 0, this.levelCounter = 800, this.levelCounterMax = 800, APP.points = 0, 
+        this.updateCoins();
     },
     transitionIn: function() {
         this.build();
@@ -2922,8 +2937,8 @@ var Application = AbstractApplication.extend({
         this.maxScale = 1, this.growType = 1, this.maxInitScale = 1;
     },
     build: function() {
-        this.updateable = !0, this.imgSource instanceof PIXI.Text ? this.sprite = this.imgSource : this.sprite = new PIXI.Sprite.fromFrame(this.imgSource), 
-        this.sprite.anchor.x = .5, this.sprite.anchor.y = .5, this.sprite.alpha = 1, this.sprite.scale.x = this.maxScale * this.maxInitScale, 
+        this.updateable = !0, this.imgSource instanceof PIXI.Text || this.imgSource instanceof PIXI.Graphics ? this.sprite = this.imgSource : (this.sprite = new PIXI.Sprite.fromFrame(this.imgSource), 
+        this.sprite.anchor.x = .5, this.sprite.anchor.y = .5), this.sprite.alpha = 1, this.sprite.scale.x = this.maxScale * this.maxInitScale, 
         this.sprite.scale.y = this.maxScale * this.maxInitScale, -1 === this.growType && (this.sprite.scale.x = this.maxScale, 
         this.sprite.scale.y = this.maxScale), this.getContent().rotation = this.rotation;
     },

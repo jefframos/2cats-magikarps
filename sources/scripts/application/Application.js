@@ -6,7 +6,7 @@ var Application = AbstractApplication.extend({
 
         function initialize(){
             self._super(windowWidth, windowHeight);
-            self.stage.setBackgroundColor(0xdb453c);
+            self.stage.setBackgroundColor(0x452E69);
             self.stage.removeChild(self.loadText);
 
             self.labelDebug = new PIXI.Text('', {font:'15px Arial'});

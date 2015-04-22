@@ -93,6 +93,15 @@ var GameScreen = AbstractScreen.extend({
 			});
 		}
 
+
+
+		this.brilhoBase = new SimpleSprite('baseDegrade.png');
+		this.container.addChild(this.brilhoBase.getContent());
+		scaleConverter(this.brilhoBase.getContent().width, windowWidth, 1, this.brilhoBase);
+		this.brilhoBase.getContent().position.x = windowWidth / 2 - this.brilhoBase.getContent().width / 2;
+		
+
+
 		this.layerManager = new LayerManager();
 		this.layerManager.build('Main');
 
@@ -104,29 +113,28 @@ var GameScreen = AbstractScreen.extend({
 		this.layerManager.addLayer(this.layer);
 
 
-		this.tapToPlay = new PIXI.Text('TAP AND HOLD TO PLAY', {align:'center',font:'30px Vagron', fill:'#FFF', wordWrap:true, wordWrapWidth:500});
+
+
+		this.coinsLabel = new PIXI.Text('0', {align:'center',font:'80px Vagron', fill:'#5E4487', wordWrap:true, wordWrapWidth:500});
+		scaleConverter(this.coinsLabel.height, windowHeight, 0.2, this.coinsLabel);
+		this.addChild(this.coinsLabel);
+
+		this.tapToPlay = new PIXI.Text('TAP AND HOLD TO PLAY', {align:'center',font:'30px Vagron', fill:'#5E4487', wordWrap:true, wordWrapWidth:500});
 		scaleConverter(this.tapToPlay.height, windowHeight, 0.06, this.tapToPlay);
 		this.tapToPlay.alpha = 0;
-		this.tapToPlay.position.y = windowHeight / 2;
+		this.tapToPlay.position.y = windowHeight / 1.1;
 		this.tapToPlay.position.x = windowWidth / 2 - this.tapToPlay.width / 2;
 		this.addChild(this.tapToPlay);
-
-		this.initLevel();
-
-		this.coinsLabel = new PIXI.Text('0', {align:'center',font:'30px Vagron', fill:'#f5c30c', wordWrap:true, wordWrapWidth:500});
-		scaleConverter(this.coinsLabel.height, windowHeight, 0.06, this.coinsLabel);
-		this.addChild(this.coinsLabel);
-		this.updateCoins();
-
 
 		this.loaderBar = new LifeBarHUD(windowWidth * 0.6, 20, 0, 0xf5c30c, 0xFF453c);
         this.addChild(this.loaderBar.getContent());
         this.loaderBar.getContent().position.x = windowWidth / 2 - this.loaderBar.getContent().width / 2;
         this.loaderBar.getContent().position.y = windowHeight / 1.1;
         this.loaderBar.updateBar(0, 100);
+        this.loaderBar.getContent().alpha = 0;
 
+		this.initLevel();
 		this.startLevel = false;
-		
 		
 	},
 	miss:function() {
@@ -140,19 +148,24 @@ var GameScreen = AbstractScreen.extend({
 		errou.setPosition(this.player.getPosition().x, this.player.getPosition().y);
 		this.layer.addChild(errou);
 
-		this.levelCounter -= this.levelCounterMax * 0.05;
+		this.player.inError = true;
+		this.levelCounter -= this.levelCounterMax * 0.1;
 		if(this.levelCounter < 0){
 			this.levelCounter = 0;
 		}
 	},
 	shoot:function(force) {
+		if(this.player.inError){
+			return;
+		}
 		this.startLevel = true;
 		this.player.jump(force);
 		this.force = 0;
 		if(this.tapToPlay.alpha === 0){
 			return;
 		}
-		TweenLite.to(this.tapToPlay, 0.5, {alpha:0});
+		TweenLite.to(this.tapToPlay, 0.2, {alpha:0});
+		TweenLite.to(this.loaderBar.getContent(), 0.2, {delay:0.2, alpha:1});
 	},
 	reset:function(){
 		this.destroy();
@@ -162,16 +175,18 @@ var GameScreen = AbstractScreen.extend({
 		if(!this.updateable){
 			return;
 		}
-		if(this.tapDown && this.force < 16){
-			this.force += 0.75;
-			this.player.charge();
-			// console.log(this.force);
-		}
-		// console.log(this.startLevel);
-		if(this.startLevel){
-			this.levelCounter --;
-			if(this.levelCounter < 0){
-				this.levelCounter = 0;
+		if(!this.player.inError){
+			if(this.tapDown && this.force < 16){
+				this.force += 0.75;
+				this.player.charge();
+				// console.log(this.force);
+			}
+			// console.log(this.startLevel);
+			if(this.startLevel){
+				this.levelCounter --;
+				if(this.levelCounter < 0){
+					this.levelCounter = 0;
+				}
 			}
 		}
 		if(this.levelCounter <= 0){
@@ -208,8 +223,9 @@ var GameScreen = AbstractScreen.extend({
 	},
 	updateCoins:function(){
 		this.coinsLabel.setText(APP.points);
-		this.coinsLabel.position.x = windowWidth * 0.1;
-		this.coinsLabel.position.y = windowWidth * 0.1;
+		this.coinsLabel.position.x = windowWidth / 2 - this.coinsLabel.width / 2;
+		this.coinsLabel.position.y = windowHeight / 2 - this.coinsLabel.height / 2;
+		this.coinsLabel.parent.setChildIndex(this.coinsLabel, 0);
 	},
 	initLevel:function(whereInit){
 		this.player = new Ball({x:0,y:0}, this);
@@ -217,7 +233,9 @@ var GameScreen = AbstractScreen.extend({
 		this.layer.addChild(this.player);
 		this.player.getContent().position.x = windowWidth / 2;
 		this.player.getContent().position.y = windowHeight / 1.2;
-		this.player.setFloor(windowHeight / 1.2);
+		var base = windowHeight / 1.2;
+		this.player.setFloor(base);
+		this.brilhoBase.getContent().position.y = base +  this.player.spriteBall.height / 2;
 
 		this.targetJump = new Coin({x:0,y:0});
 		this.targetJump.build();
@@ -232,6 +250,9 @@ var GameScreen = AbstractScreen.extend({
         this.levelCounterMax = 800;
 
 		APP.points = 0;
+
+		this.updateCoins();
+
 	},
 	
 	transitionIn:function()

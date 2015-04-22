@@ -23,9 +23,18 @@ var Coin = Entity.extend({
 	},
 	build: function(){
 
-		this.sprite = new PIXI.Sprite.fromFrame(this.imgSource);
-		this.sprite.anchor.x = 0.5;
-		this.sprite.anchor.y = 0.5;
+		// this.sprite = new PIXI.Sprite.fromFrame(this.imgSource);
+		this.spriteBall = new PIXI.Graphics();
+		this.spriteBall.beginFill(0xFFFFFF);
+		var size = windowHeight * 0.05;
+		this.spriteBall.drawRect(-size/2,-size/2,size,size);
+		// this.spriteBall.drawCircle(0,0,windowHeight * 0.02);
+
+		this.sprite = new PIXI.Sprite();
+        this.sprite.addChild(this.spriteBall);
+
+		// this.sprite.anchor.x = 0.5;
+		// this.sprite.anchor.y = 0.5;
 
 		this.updateable = true;
 		this.collidable = true;
@@ -40,7 +49,7 @@ var Coin = Entity.extend({
 
 	},
 	update: function(){
-		this.range = this.sprite.height / 2.5;
+		this.range = this.spriteBall.width / 2;
 		this._super();
 	},
 	preKill:function(){
