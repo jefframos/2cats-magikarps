@@ -4,9 +4,9 @@
         <key>fileFormatVersion</key>
         <int>3</int>
         <key>texturePackerVersion</key>
-        <string>3.6.0</string>
+        <string>3.7.1</string>
         <key>fileName</key>
-        <string>C:/xampp/htdocs/2cats-bounce-balls/sources/textures/atlas.tps</string>
+        <string>C:/xampp/htdocs/2cats-magikarps/sources/textures/atlas.tps</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -213,19 +213,13 @@
             <filename>play1.png</filename>
             <filename>barata.png</filename>
             <filename>partEnemy.png</filename>
-            <filename>thumbs/fundot6.png</filename>
-            <filename>thumbs/fundot1.png</filename>
-            <filename>thumbs/fundot2.png</filename>
-            <filename>thumbs/fundot3.png</filename>
-            <filename>thumbs/fundot4.png</filename>
-            <filename>thumbs/fundot5.png</filename>
             <filename>botao_rankin.png</filename>
             <filename>botao_volume.png</filename>
-            <filename>TITLE.png</filename>
             <filename>TITLE_rotulo.png</filename>
             <filename>botao_config.png</filename>
             <filename>botao_credits.png</filename>
             <filename>botao_play.png</filename>
+            <filename>baseDegrade.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>
@@ -237,5 +231,15 @@
         <uint>1</uint>
         <key>commonDivisorY</key>
         <uint>1</uint>
+        <key>packNormalMaps</key>
+        <false/>
+        <key>autodetectNormalMaps</key>
+        <true/>
+        <key>normalMapFilter</key>
+        <string></string>
+        <key>normalMapSuffix</key>
+        <string></string>
+        <key>normalMapSheetFileName</key>
+        <filename></filename>
     </struct>
 </data>
