@@ -17,13 +17,18 @@ var Coin = Entity.extend({
 		this.imgSource = 'bullet.png';
 		this.particleSource = 'bullet.png';
 		this.rot = 0;
+		this.inMove = false;
 	},
 	startScaleTween: function(){
 		TweenLite.from(this.getContent().scale, 0.3, {x:0, y:0, ease:'easeOutBack'});
 	},
 	randomPos: function(rangeMin, rangeMax){
 		var yDest = rangeMin + Math.random() * rangeMax;
-		TweenLite.to(this.getContent(), 0.5, {delay:0.4, y:yDest});
+		this.inMove = true;
+		var self = this;
+		TweenLite.to(this.getContent(), 0.5, {delay:0.4, y:yDest, onComplete:function(){
+			self.inMove = false;
+		}});
 	},
 	build: function(){
 
@@ -48,13 +53,18 @@ var Coin = Entity.extend({
 		
 		this.collideArea = new PIXI.Rectangle(-50, -50, windowWidth + 100, windowHeight + 100);
 
-		this.particlesCounterMax = 5;
-        this.particlesCounter = 5;//this.particlesCounterMax *2;
+
+        this.particlesCounterMax = 8;
+        this.particlesCounter = 1;
 
 	},
 	update: function(){
-		this.range = this.spriteBall.width / 2;
+		this.range = this.spriteBall.width;
 		this._super();
+
+		if(this.inMove){
+			this.updateableParticles();
+		}
 	},
 	changeShape:function(){
 	},
@@ -62,13 +72,13 @@ var Coin = Entity.extend({
 		
 		var particle = null;
 		var tempParticle = null;
-		var size = 8;
+		this.size = 8;
 		for (var i = 10; i >= 0; i--) {
 
 			console.log('part');
 			tempParticle = new PIXI.Graphics();
 			tempParticle.beginFill(0xFFFFFF);
-			tempParticle.drawRect(-size/2,-size/2,size,size);
+			tempParticle.drawRect(-this.size/2,-this.size/2,this.size,this.size);
 			// this.spriteBall.drawCircle(0,0,windowHeight * 0.02);
 
 			particle = new Particles({x: Math.random() * 10 - 5, y:Math.random() * 10 - 5}, 600, tempParticle, Math.random() * 0.05);
@@ -85,9 +95,9 @@ var Coin = Entity.extend({
 		}
 
 		tempParticle = new PIXI.Graphics();
-		size = windowHeight * 0.05;
+		this.size = windowHeight * 0.05;
 		tempParticle.beginFill(0xFFFFFF);
-		tempParticle.drawRect(-size/2,-size/2,size,size);
+		tempParticle.drawRect(-this.size/2,-this.size/2,this.size,this.size);
 
 		particle = new Particles({x: 0, y:0}, 600, tempParticle, 0);
 		particle.maxScale = this.getContent().scale.x * 5;
@@ -100,6 +110,59 @@ var Coin = Entity.extend({
 		particle.setPosition(this.getPosition().x,this.getPosition().y);
 		this.layer.addChild(particle);
 	},
+	updateableParticles:function(){
+        this.particlesCounter --;
+        if(this.particlesCounter <= 0)
+        {
+            this.particlesCounter = this.particlesCounterMax;
+
+            //efeito 1
+            // var particle = new Particles({x: 0, y:0}, 120, this.particleSource, Math.random() * 0.05);
+            // particle.maxScale = this.getContent().scale.x;
+            // particle.growType = -1;
+            // particle.build();
+            // particle.gravity = 0.1;
+            // particle.alphadecress = 0.08;
+            // particle.scaledecress = -0.08;
+            // particle.setPosition(this.getPosition().x - (Math.random() + this.getContent().width * 0.1) / 2,
+            //     this.getPosition().y);
+            // this.layer.addChild(particle);
+
+            //efeito 2
+            // var particle = new Particles({x: Math.random() * 4 - 2, y:Math.random()}, 120, this.particleSource, Math.random() * 0.05);
+            // particle.maxScale = this.getContent().scale.x;
+            // particle.maxInitScale = 0.4;
+            // // particle.growType = -1;
+            // particle.build();
+            // particle.gravity = 0.1 * Math.random() + 0.2;
+            // particle.alphadecress = 0.05;
+            // particle.scaledecress = 0.03;
+            // particle.setPosition(this.getPosition().x - (Math.random() + this.getContent().width * 0.1) / 2,
+            //     this.getPosition().y);
+            // this.layer.addChild(particle);
+
+
+            var tempPart = new PIXI.Graphics();
+			tempPart.beginFill(0xFFFFFF);
+			tempPart.drawRect(-this.size/2,-this.size/2,this.size,this.size);
+
+            //efeito 3
+            var particle = new Particles({x: 0, y:0}, 120, tempPart, 0);
+            // particle.maxScale = this.getContent().scale.x / 2;
+            // particle.initScale = this.getContent().scale.x / 2;
+            // particle.maxInitScale = particle.maxScale / 1.5;
+            // particle.growType = -1;
+            particle.build();
+            particle.gravity = 0.0;
+            // particle.getContent().tint = APP.appModel.currentPlayerModel.color;
+            particle.alphadecress = 0.04;
+            particle.scaledecress = -0.01;
+            particle.setPosition(this.getPosition().x,
+                this.getPosition().y);
+            this.layer.addChild(particle);
+            particle.getContent().parent.setChildIndex(particle.getContent() , 0);
+        }
+    },
 	preKill:function(){
 		if(this.invencible){
 			return;

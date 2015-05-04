@@ -33,7 +33,7 @@ var Ball = Entity.extend({
 		this.spriteBall = new PIXI.Graphics();
 		this.spriteBall.beginFill(this.color);
 		this.maxSize = windowHeight * 0.05;
-		this.spriteBall.drawCircle(0,0,this.maxSize);
+		this.spriteBall.drawCircle(0,-this.maxSize,this.maxSize);
 
 		this.sprite = new PIXI.Sprite();
         this.sprite.addChild(this.spriteBall);
@@ -75,6 +75,7 @@ var Ball = Entity.extend({
 	},
 	setFloor: function(pos){
 		this.floorPos = pos;
+		this.velocity.y += this.gravityVal;
 	},
 	hideShadows: function(){
 		TweenLite.to(this.shadow, 0.1, {alpha:0});
@@ -91,6 +92,7 @@ var Ball = Entity.extend({
 		}
 		this.gravity = 0;
 		this.velocity.y = - force;
+		this.firstJump = true;
 	},
 	improveGravity: function(){
 		if(this.gravityVal >= 1){
@@ -105,28 +107,37 @@ var Ball = Entity.extend({
 		if(!this.blockCollide){
 			this.layer.collideChilds(this);
 		}
+
+		this.spriteBall.width = this.force + this.maxSize - Math.abs(this.velocity.y);
+		if(this.spriteBall.width < this.maxSize)
+		{
+			this.spriteBall.width = this.maxSize;
+		}
+        this.spriteBall.height = this.force + this.maxSize + Math.abs(this.velocity.y);
+
 		this.range = this.spriteBall.height / 2;
 
-		// console.log(this.getContent().position.y , this.velocity.y , this.floorPos);
-		if(this.getContent().position.y + this.velocity.y >= this.floorPos - this.spriteBall.height / 2 + this.maxSize){
+		if(this.getContent().position.y + this.velocity.y >= this.floorPos + this.maxSize){//} + this.spriteBall.height / 2){
+			if(this.firstJump){
+				this.screen.addCrazyMessage('RELEASE');
+			}
+			this.getContent().position.y = this.floorPos + this.maxSize;// + this.spriteBall.height / 2;
 			this.velocity.y = 0;
 			this.gravity = 0;
-			this.getContent().position.y = this.floorPos - this.spriteBall.height / 2 + this.maxSize;
 			this.breakJump = false;
 			this.blockCollide = false;
 			this.inError = false;
-		}else{
+			this.force = 0;
+		}else if(this.breakJump||this.velocity.y !==0){
 			this.velocity.y += this.gravityVal;
 			this.breakJump = true;
-			// this.velocity.y = this.gravity;
 		}
+
 		if(this.velocity.y !== 0){
 			this.updateableParticles();
 		}else{
 			this.perfectShoot ++;
 		}
-		this.spriteBall.width = this.force + this.maxSize;
-        this.spriteBall.height = this.force + this.maxSize;
 	},
 	updateableParticles:function(){
         this.particlesCounter --;
@@ -176,7 +187,7 @@ var Ball = Entity.extend({
             particle.alphadecress = 0.05;
             particle.scaledecress = -0.05;
             particle.setPosition(this.getPosition().x - (Math.random() + this.getContent().width * 0.1) / 2,
-                this.getPosition().y);
+                this.getPosition().y - this.spriteBall.height / 2);
             this.layer.addChild(particle);
             particle.getContent().parent.setChildIndex(particle.getContent() , 0);
         }
@@ -201,8 +212,10 @@ var Ball = Entity.extend({
 					this.preKill();
 				}else if(arrayCollide[i].type === 'coin'){
 					this.velocity.y = 0;
+					var isPerfect = false;
 					if(this.perfectShoot <= 4){
 						this.screen.getPerfect();
+						isPerfect = true;
 						if(this.perfectShootAcum === 0){
 							this.perfectShootAcum = 4;
 						}else{
@@ -254,7 +267,7 @@ var Ball = Entity.extend({
 					// labelCoin.setPosition(this.getPosition().x, this.getPosition().y);
 					// this.screen.layer.addChild(labelCoin);
 
-					this.screen.getCoin();
+					this.screen.getCoin(isPerfect);
 				}
 			}
 		}
@@ -263,7 +276,8 @@ var Ball = Entity.extend({
 		this.color = color;
 		this.spriteBall.clear();
 		this.spriteBall.beginFill(color);
-		this.spriteBall.drawCircle(0,0,this.maxSize);
+		this.spriteBall.drawCircle(0,-this.maxSize,this.maxSize);
+		// this.spriteBall.drawCircle(0,0,this.maxSize);
 	},
 	charge:function(force){
 		var angle = degreesToRadians(Math.random() * 360);
@@ -293,7 +307,7 @@ var Ball = Entity.extend({
         // particle.getContent().tint = APP.appModel.currentPlayerModel.color;
         // particle.alphadecress = 0.05;
         particle.scaledecress = -0.01;
-        particle.setPosition(pPos.x ,pPos.y);
+        particle.setPosition(pPos.x ,pPos.y- this.spriteBall.height / 2);
         this.layer.addChild(particle);
         particle.getContent().parent.setChildIndex(particle.getContent() , 0);
 
@@ -314,7 +328,7 @@ var Ball = Entity.extend({
 			particle.getContent().tint = APP.appModel.currentPlayerModel.color;
 			particle.scaledecress = 0.02;
 			particle.setPosition(this.getPosition().x - (Math.random() + this.getContent().width * 0.1) / 2,
-				this.getPosition().y);
+				this.getPosition().y - this.spriteBall.height / 2);
 			this.layer.addChild(particle);
 		}
 	},

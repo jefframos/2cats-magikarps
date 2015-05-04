@@ -31,10 +31,17 @@ var GameScreen = AbstractScreen.extend({
 	initApplication:function(){
 		var self = this;
 	   
-		this.vecColors = [0x578940,0xd730a4,0xde8366,0x23dfce,0xa84dd8,0x2b5527];
+		this.vecColors = [0xFFCE62,0xE87C1E,0xFF562D,0xE81E55,0xE621FF];
+		this.vecPerfects = ['PERFECT!', 'AWESOME!', 'AMAZING!', 'GOD!'];
+		this.vecGood = ['GOOD', 'COOL', 'YO', 'NOT BAD'];
+		this.vecError = ['NOOOO!', 'BAD', '=(', 'NOT'];
 		this.backColor = 0x452E69;
 		this.background = new PIXI.Graphics();
 		this.background.beginFill(this.backColor);
+
+		this.interactiveBackground = new InteractiveBackground(this);
+		this.interactiveBackground.build();
+		this.addChild(this.interactiveBackground);
 
 		// this.changeColor();
 		// this.background.alpha = 0;
@@ -128,20 +135,18 @@ var GameScreen = AbstractScreen.extend({
 
 		this.coinsLabel = new PIXI.Text('0', {align:'center',font:'80px Vagron', fill:'#FFFFFF', wordWrap:true, wordWrapWidth:500});
 		scaleConverter(this.coinsLabel.height, windowHeight, 0.2, this.coinsLabel);
-		this.coinsLabel.alpha = 0.3;
+		this.coinsLabel.alpha = 0.5;
 		this.addChild(this.coinsLabel);
 
-		this.tapToPlay = new PIXI.Text('TAP AND HOLD TO PLAY', {align:'center',font:'30px Vagron', fill:'#5E4487', wordWrap:true, wordWrapWidth:500});
-		scaleConverter(this.tapToPlay.height, windowHeight, 0.06, this.tapToPlay);
-		this.tapToPlay.alpha = 0;
-		this.tapToPlay.position.y = windowHeight / 1.1;
-		this.tapToPlay.position.x = windowWidth / 2 - this.tapToPlay.width / 2;
-		this.addChild(this.tapToPlay);
+		this.crazyContent = new PIXI.DisplayObjectContainer();
+		this.addChild(this.crazyContent);
+		this.addCrazyMessage('TAP AND HOLD');
+		
 
-		this.loaderBar = new LifeBarHUD(windowWidth * 0.6, 20, 0, 0xFFFFFF, 0xFFFFFF);
+		this.loaderBar = new LifeBarHUD(windowWidth, 20, 0, 0xFFFFFF, 0xFFFFFF);
 		this.addChild(this.loaderBar.getContent());
-		this.loaderBar.getContent().position.x = windowWidth / 2 - this.loaderBar.getContent().width / 2;
-		this.loaderBar.getContent().position.y = windowHeight / 1.1;
+		this.loaderBar.getContent().position.x = 0;//windowWidth / 2 - this.loaderBar.getContent().width / 2;
+		this.loaderBar.getContent().position.y = 0;//windowHeight / 1.1;
 		this.loaderBar.updateBar(0, 100);
 		this.loaderBar.getContent().alpha = 0;
 
@@ -149,12 +154,54 @@ var GameScreen = AbstractScreen.extend({
 		this.startLevel = false;
 		
 	},
+	addCrazyMessage:function(message) {
+		if(this.crazyLabel && this.crazyLabel.parent){
+			if(this.crazyLabel.text === message){
+				return;
+			}
+			this.crazyLabel.parent.removeChild(this.crazyLabel);
+		}
+		if(this.crazyLabel2 && this.crazyLabel2.parent){
+			this.crazyLabel2.parent.removeChild(this.crazyLabel2);
+		}
+		var rot = Math.random() * 0.01 + 0.04;
+		rot = Math.random() < 0.5? -rot:rot;
+		var scl = 1;
+		this.crazyLabel = new PIXI.Text(message, {align:'center',font:'30px Vagron', fill:'#9d47e0', wordWrap:true, wordWrapWidth:500});
+		// scl = scaleConverter(this.crazyLabel.height, windowHeight, 0.06, this.crazyLabel);
+		this.crazyLabel.rotation = rot;
+		this.crazyLabel.position.y = windowHeight / 1.1 + this.crazyLabel.height / 2;
+		this.crazyLabel.position.x = windowWidth / 2;
+		this.crazyLabel.anchor = {x:0.5, y:0.5};
+
+		this.crazyLabel2 = new PIXI.Text(message, {align:'center',font:'30px Vagron', fill:'#13c2b6', wordWrap:true, wordWrapWidth:500});
+		// scaleConverter(this.crazyLabel2.height, windowHeight, 0.06, this.crazyLabel2);
+		this.crazyLabel2.rotation = -rot;
+		this.crazyLabel2.position.y = windowHeight / 1.1 + this.crazyLabel2.height / 2;
+		this.crazyLabel2.position.x = windowWidth / 2;
+		this.crazyLabel2.anchor = {x:0.5, y:0.5};
+
+
+		this.crazyContent.addChild(this.crazyLabel);
+		this.crazyContent.addChild(this.crazyLabel2);
+		this.crazyContent.alpha = 1;
+		this.crazyContent.rotation = 0;
+
+		// TweenLite.from(this.crazyContent, 0.2, {rotation:Math.random() * 0.8 - 0.4});
+
+		TweenLite.from(this.crazyLabel, 0.4, {rotation:0});
+		TweenLite.from(this.crazyLabel2, 0.4, {rotation:0});
+
+		TweenLite.from(this.crazyLabel.scale, 0.2, {x:scl * 2, y:scl * 2});
+		TweenLite.from(this.crazyLabel2.scale, 0.2, {x:scl * 2, y:scl * 2});
+	},
 	miss:function() {
+
 		this.player.breakJump = true;
 		this.player.velocity.y = 0;
-
+		var wrongLabel = this.vecError[Math.floor(this.vecError.length * Math.random())];
 		var rot = Math.random() * 0.004;
-		var tempLabel = new PIXI.Text('ERROU', {font:'50px Vagron', fill:'#ec8b78'});
+		var tempLabel = new PIXI.Text(wrongLabel, {font:'50px Vagron', fill:'#ec8b78'});
 
 		var errou = new Particles({x: 0, y:0}, 120, tempLabel,rot);
 		errou.maxScale = this.player.getContent().scale.x;
@@ -166,7 +213,7 @@ var GameScreen = AbstractScreen.extend({
 		errou.setPosition(this.player.getPosition().x - tempLabel.width / 2, this.player.getPosition().y - 50);
 		this.layer.addChild(errou);
 
-		var errou2 = new Particles({x: 0, y:0}, 120, new PIXI.Text('ERROU', {font:'50px Vagron', fill:'#d41819'}),-rot);
+		var errou2 = new Particles({x: 0, y:0}, 120, new PIXI.Text(wrongLabel, {font:'50px Vagron', fill:'#e25a30'}),-rot);
 		errou2.maxScale = this.player.getContent().scale.x;
 		errou2.build();
 		// errou2.getContent().tint = 0xf5c30c;
@@ -175,6 +222,9 @@ var GameScreen = AbstractScreen.extend({
 		errou2.scaledecress = +0.05;
 		errou2.setPosition(this.player.getPosition().x - tempLabel.width / 2+2, this.player.getPosition().y - 50+2);
 		this.layer.addChild(errou2);
+
+		errou2.getContent().parent.setChildIndex(errou.getContent(), errou.getContent().parent.children.length - 1);
+		errou2.getContent().parent.setChildIndex(errou2.getContent(), errou2.getContent().parent.children.length - 1);
 
 
 		this.player.inError = true;
@@ -191,11 +241,13 @@ var GameScreen = AbstractScreen.extend({
 		this.player.jump(force);
 		this.player.improveGravity();
 		this.force = 0;
-		if(this.tapToPlay.alpha === 0){
-			return;
-		}
-		TweenLite.to(this.tapToPlay, 0.2, {alpha:0});
+		// if(this.crazyContent.alpha === 0){
+		// 	return;
+		// }
+		// TweenLite.to(this.crazyContent, 0.2, {alpha:0});
 		TweenLite.to(this.loaderBar.getContent(), 0.2, {delay:0.2, alpha:1});
+
+		this.addCrazyMessage('HOLD');
 	},
 	reset:function(){
 		this.destroy();
@@ -220,6 +272,11 @@ var GameScreen = AbstractScreen.extend({
 			}
 		}
 		this.player.force = this.force;
+		if(this.player.velocity.y < 0){
+			this.interactiveBackground.accel =  Math.abs(this.player.velocity.y) / 15;
+		}else{
+			this.interactiveBackground.accel = 0;
+		}
 		if(this.levelCounter <= 0){
 			this.gameOver();
 		}
@@ -229,9 +286,9 @@ var GameScreen = AbstractScreen.extend({
 	gameOver:function(){
 		this.reset();
 	},
-	getPerfect:function(){
+	addRegularLabel:function(label, font){
 		var rot = Math.random() * 0.004;
-		var tempLabel = new PIXI.Text('PERFECT!', {font:'50px Vagron', fill:'#9d47e0'});
+		var tempLabel = new PIXI.Text(label, {font:font, fill:'#9d47e0'});
 
 		var perfect = new Particles({x: 0, y:0}, 120, tempLabel,rot);
 		perfect.maxScale = this.player.getContent().scale.x;
@@ -243,7 +300,7 @@ var GameScreen = AbstractScreen.extend({
 		perfect.setPosition(this.player.getPosition().x - tempLabel.width / 2, this.player.getPosition().y + 50);
 		this.layer.addChild(perfect);
 
-		var perfect2 = new Particles({x: 0, y:0}, 120, new PIXI.Text('PERFECT!', {font:'50px Vagron', fill:'#13c2b6'}),-rot);
+		var perfect2 = new Particles({x: 0, y:0}, 120, new PIXI.Text(label, {font:font, fill:'#13c2b6'}),-rot);
 		perfect2.maxScale = this.player.getContent().scale.x;
 		perfect2.build();
 		// perfect2.getContent().tint = 0xf5c30c;
@@ -257,9 +314,13 @@ var GameScreen = AbstractScreen.extend({
 		if(this.levelCounter > this.levelCounterMax){
 			this.levelCounter = this.levelCounterMax;
 		}
+	},
+	getPerfect:function(){
+		this.addRegularLabel(this.vecPerfects[Math.floor(this.vecPerfects.length * Math.random())], '50px Vagron');
+		
 		this.earthquake(40);
 	},
-	getCoin:function(){
+	getCoin:function(isPerfect){
 		this.levelCounter += this.levelCounterMax * 0.05;
 		if(this.levelCounter > this.levelCounterMax){
 			this.levelCounter = this.levelCounterMax;
@@ -267,6 +328,11 @@ var GameScreen = AbstractScreen.extend({
 		this.targetJump.randomPos(windowHeight * 0.05, windowHeight * 0.4);
 		this.updateCoins();
 		this.targetJump.explode();
+
+		if(!isPerfect){
+			this.addRegularLabel(this.vecGood[Math.floor(this.vecGood.length * Math.random())], '40px Vagron');
+		}
+
 		this.earthquake(20);
 		this.changeColor();
 	},
@@ -287,7 +353,7 @@ var GameScreen = AbstractScreen.extend({
 			}});
 		}
 
-		tempColor = addBright(temptempColor, 0.5);
+		tempColor = addBright(temptempColor, 0.65);
 		// this.player.spriteBall.tint = tempColor;
 		this.player.setColor(tempColor);
 		this.loaderBar.setBackColor(tempColor);
@@ -322,7 +388,7 @@ var GameScreen = AbstractScreen.extend({
 		this.targetJump.getContent().position.x = windowWidth / 2;
 		this.targetJump.getContent().position.y = windowHeight * 0.2;
 
-		TweenLite.to(this.tapToPlay, 0.5, {alpha:1});
+		TweenLite.to(this.crazyContent, 0.5, {alpha:1});
 
 		this.force = 0;
 		this.levelCounter = 800;
