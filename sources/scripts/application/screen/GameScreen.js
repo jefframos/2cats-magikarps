@@ -200,7 +200,7 @@ var GameScreen = AbstractScreen.extend({
 		if(!this.player.inError){
 			if(this.tapDown && this.force < 30){
 				this.force += 0.75;
-				this.player.charge();
+				
 				// console.log(this.force);
 			}
 			// console.log(this.startLevel);
@@ -211,6 +211,7 @@ var GameScreen = AbstractScreen.extend({
 				}
 			}
 		}
+		this.player.force = this.force;
 		if(this.levelCounter <= 0){
 			this.gameOver();
 		}
@@ -266,8 +267,10 @@ var GameScreen = AbstractScreen.extend({
 		this.background.tint = 0xFFFFFF;
 		tempColor = addHue(tempColor, (Math.random() - 0.5) * 5);
 		tempColor = setSaturation(tempColor, 0.2);
-		tempColor = addHue(tempColor, (Math.random() - 0.5) * 10);
+		tempColor = addHue(tempColor, 0.9);
 		TweenLite.to(this.background, 0.3, {tint:tempColor});
+		// this.background.tint = tempColor;
+		// alert(tempColor);
 
 		tempColor = addBright(tempColor, 0.5);
 		this.player.spriteBall.tint = tempColor;

@@ -766,15 +766,15 @@ var Application = AbstractApplication.extend({
         });
     },
     build: function() {
-        this.spriteBall = new PIXI.Graphics(), this.spriteBall.beginFill(16777215), this.spriteBall.drawCircle(0, 0, .05 * windowHeight), 
-        this.sprite = new PIXI.Sprite(), this.sprite.addChild(this.spriteBall), this.sprite.anchor.x = .5, 
-        this.sprite.anchor.y = .5, this.updateable = !0, this.collidable = !0, this.getContent().alpha = .1, 
-        TweenLite.to(this.getContent(), .3, {
+        this.spriteBall = new PIXI.Graphics(), this.spriteBall.beginFill(16777215), this.maxSize = .05 * windowHeight, 
+        this.spriteBall.drawCircle(0, 0, .05 * windowHeight - 30), this.sprite = new PIXI.Sprite(), 
+        this.sprite.addChild(this.spriteBall), this.sprite.anchor.x = .5, this.sprite.anchor.y = .5, 
+        this.updateable = !0, this.collidable = !0, this.getContent().alpha = .1, TweenLite.to(this.getContent(), .3, {
             alpha: 1
         }), this.collideArea = new PIXI.Rectangle(-50, -50, windowWidth + 100, windowHeight + 100), 
         this.particlesCounterMax = 2, this.particlesCounter = 1, this.floorPos = windowHeight, 
         this.gravity = 0, this.gravityVal = .3, this.breakJump = !1, this.blockCollide = !1, 
-        this.inError = !1, this.perfectShoot = 0, this.perfectShootAcum = 0;
+        this.inError = !1, this.perfectShoot = 0, this.perfectShootAcum = 0, this.force = 0;
     },
     setFloor: function(pos) {
         this.floorPos = pos;
@@ -798,21 +798,23 @@ var Application = AbstractApplication.extend({
     },
     update: function() {
         this._super(), this.blockCollide || this.layer.collideChilds(this), this.range = this.spriteBall.height / 2, 
-        this.getContent().position.y + this.velocity.y >= this.floorPos ? (this.velocity.y = 0, 
-        this.gravity = 0, this.getContent().position.y = this.floorPos, this.breakJump = !1, 
-        this.blockCollide = !1, this.inError = !1) : (this.velocity.y += this.gravityVal, 
-        this.breakJump = !0), 0 !== this.velocity.y ? this.updateableParticles() : this.perfectShoot++;
+        this.getContent().position.y + this.velocity.y >= this.floorPos - this.spriteBall.height / 2 ? (this.velocity.y = 0, 
+        this.gravity = 0, this.getContent().position.y = this.floorPos - this.spriteBall.height / 2, 
+        this.breakJump = !1, this.blockCollide = !1, this.inError = !1) : (this.velocity.y += this.gravityVal, 
+        this.breakJump = !0), 0 !== this.velocity.y ? this.updateableParticles() : this.perfectShoot++, 
+        this.spriteBall.width = this.force + this.maxSize, this.spriteBall.height = this.force + this.maxSize;
     },
     updateableParticles: function() {
         if (this.particlesCounter--, this.particlesCounter <= 0) {
             this.particlesCounter = this.particlesCounterMax;
+            var tempPart = new PIXI.Graphics();
+            tempPart.beginFill(this.spriteBall.tint), tempPart.drawCircle(0, 0, this.spriteBall.width);
             var particle = new Particles({
                 x: 4 * Math.random() - 2,
                 y: Math.random()
-            }, 120, this.particleSource, .05 * Math.random());
-            particle.maxScale = this.getContent().scale.x / 2, particle.initScale = this.getContent().scale.x / 10, 
-            particle.build(), particle.gravity = 0, particle.alphadecress = .05, particle.scaledecress = -.05, 
-            particle.setPosition(this.getPosition().x - (Math.random() + .1 * this.getContent().width) / 2, this.getPosition().y), 
+            }, 120, tempPart, .05 * Math.random());
+            particle.initScale = this.getContent().scale.x / 2, particle.build(), particle.gravity = 0, 
+            particle.alphadecress = .05, particle.scaledecress = -.05, particle.setPosition(this.getPosition().x - (Math.random() + .1 * this.getContent().width) / 2, this.getPosition().y), 
             this.layer.addChild(particle), particle.getContent().parent.setChildIndex(particle.getContent(), 0);
         }
     },
@@ -848,7 +850,7 @@ var Application = AbstractApplication.extend({
             this.screen.layer.addChild(labelCoin2), this.screen.getCoin();
         }
     },
-    charge: function() {
+    charge: function(force) {
         var angle = degreesToRadians(360 * Math.random()), dist = .9 * this.spriteBall.height, pPos = {
             x: dist * Math.sin(angle) + this.getContent().position.x,
             y: dist * Math.cos(angle) + this.getContent().position.y
@@ -2171,9 +2173,9 @@ var Application = AbstractApplication.extend({
         this.destroy(), this.build();
     },
     update: function() {
-        this.updateable && (this.player.inError || (this.tapDown && this.force < 30 && (this.force += .75, 
-        this.player.charge()), this.startLevel && (this.levelCounter--, this.levelCounter < 0 && (this.levelCounter = 0))), 
-        this.levelCounter <= 0 && this.gameOver(), this.loaderBar.updateBar(this.levelCounter, this.levelCounterMax), 
+        this.updateable && (this.player.inError || (this.tapDown && this.force < 30 && (this.force += .75), 
+        this.startLevel && (this.levelCounter--, this.levelCounter < 0 && (this.levelCounter = 0))), 
+        this.player.force = this.force, this.levelCounter <= 0 && this.gameOver(), this.loaderBar.updateBar(this.levelCounter, this.levelCounterMax), 
         this._super());
     },
     gameOver: function() {
@@ -2211,8 +2213,7 @@ var Application = AbstractApplication.extend({
     changeColor: function() {
         var tempColor = this.background.tint;
         this.background.tint = 16777215, tempColor = addHue(tempColor, 5 * (Math.random() - .5)), 
-        tempColor = setSaturation(tempColor, .2), tempColor = addHue(tempColor, 10 * (Math.random() - .5)), 
-        TweenLite.to(this.background, .3, {
+        tempColor = setSaturation(tempColor, .2), tempColor = addHue(tempColor, .9), TweenLite.to(this.background, .3, {
             tint: tempColor
         }), tempColor = addBright(tempColor, .5), this.player.spriteBall.tint = tempColor, 
         this.loaderBar.backBaseShape.tint = tempColor;

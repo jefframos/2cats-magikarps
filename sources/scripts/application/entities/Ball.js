@@ -31,7 +31,8 @@ var Ball = Entity.extend({
 		// this.spriteBall = new PIXI.Sprite.fromFrame(this.imgSource);
 		this.spriteBall = new PIXI.Graphics();
 		this.spriteBall.beginFill(0xFFFFFF);
-		this.spriteBall.drawCircle(0,0,windowHeight * 0.05);
+		this.maxSize = windowHeight * 0.05;
+		this.spriteBall.drawCircle(0,0,windowHeight * 0.05 - 30);
 
 		this.sprite = new PIXI.Sprite();
         this.sprite.addChild(this.spriteBall);
@@ -69,6 +70,7 @@ var Ball = Entity.extend({
 
         this.perfectShoot = 0;
         this.perfectShootAcum = 0;
+        this.force = 0;
 	},
 	setFloor: function(pos){
 		this.floorPos = pos;
@@ -105,10 +107,10 @@ var Ball = Entity.extend({
 		this.range = this.spriteBall.height / 2;
 
 		// console.log(this.getContent().position.y , this.velocity.y , this.floorPos);
-		if(this.getContent().position.y + this.velocity.y >= this.floorPos){
+		if(this.getContent().position.y + this.velocity.y >= this.floorPos - this.spriteBall.height / 2){
 			this.velocity.y = 0;
 			this.gravity = 0;
-			this.getContent().position.y = this.floorPos;
+			this.getContent().position.y = this.floorPos - this.spriteBall.height / 2;
 			this.breakJump = false;
 			this.blockCollide = false;
 			this.inError = false;
@@ -122,7 +124,8 @@ var Ball = Entity.extend({
 		}else{
 			this.perfectShoot ++;
 		}
-		// console.log(this.perfectShoot);
+		this.spriteBall.width = this.force + this.maxSize;
+        this.spriteBall.height = this.force + this.maxSize;
 	},
 	updateableParticles:function(){
         this.particlesCounter --;
@@ -156,10 +159,14 @@ var Ball = Entity.extend({
             // this.layer.addChild(particle);
 
 
+            var tempPart = new PIXI.Graphics();
+			tempPart.beginFill(this.spriteBall.tint);
+			tempPart.drawCircle(0,0,this.spriteBall.width);
+
             //efeito 3
-            var particle = new Particles({x: Math.random() * 4 - 2, y:Math.random()}, 120, this.particleSource, Math.random() * 0.05);
-            particle.maxScale = this.getContent().scale.x / 2;
-            particle.initScale = this.getContent().scale.x / 10;
+            var particle = new Particles({x: Math.random() * 4 - 2, y:Math.random()}, 120, tempPart, Math.random() * 0.05);
+            // particle.maxScale = this.getContent().scale.x / 2;
+            particle.initScale = this.getContent().scale.x / 2;
             // particle.maxInitScale = particle.maxScale / 1.5;
             // particle.growType = -1;
             particle.build();
@@ -251,7 +258,7 @@ var Ball = Entity.extend({
 			}
 		}
 	},
-	charge:function(){
+	charge:function(force){
 		var angle = degreesToRadians(Math.random() * 360);
 		// var angle = degreesToRadians(60);
 		var dist = this.spriteBall.height * 0.9;
@@ -279,6 +286,8 @@ var Ball = Entity.extend({
         particle.setPosition(pPos.x ,pPos.y);
         this.layer.addChild(particle);
         particle.getContent().parent.setChildIndex(particle.getContent() , 0);
+
+        
 	},
 	preKill:function(){
 		if(this.invencible){
