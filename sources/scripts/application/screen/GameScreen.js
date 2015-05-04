@@ -160,6 +160,7 @@ var GameScreen = AbstractScreen.extend({
 		}
 		this.startLevel = true;
 		this.player.jump(force);
+		this.player.improveGravity();
 		this.force = 0;
 		if(this.tapToPlay.alpha === 0){
 			return;
@@ -176,7 +177,7 @@ var GameScreen = AbstractScreen.extend({
 			return;
 		}
 		if(!this.player.inError){
-			if(this.tapDown && this.force < 16){
+			if(this.tapDown && this.force < 30){
 				this.force += 0.75;
 				this.player.charge();
 				// console.log(this.force);
@@ -213,13 +214,23 @@ var GameScreen = AbstractScreen.extend({
 		if(this.levelCounter > this.levelCounterMax){
 			this.levelCounter = this.levelCounterMax;
 		}
+		this.earthquake(20);
 	},
 	getCoin:function(){
 		this.levelCounter += this.levelCounterMax * 0.1;
 		if(this.levelCounter > this.levelCounterMax){
 			this.levelCounter = this.levelCounterMax;
 		}
+		this.targetJump.randomPos(windowHeight * 0.05, windowHeight * 0.4);
 		this.updateCoins();
+		this.targetJump.explode();
+		this.earthquake(5);
+	},
+	earthquake:function(force){
+		var earth = new TimelineLite();
+		earth.append(TweenLite.to(this.container, 0.2, {y:-Math.random() * force, x:Math.random() * force - force / 2}));
+		earth.append(TweenLite.to(this.container, 0.2, {y:-Math.random() * force, x:Math.random() * force - force / 2}));
+		earth.append(TweenLite.to(this.container, 0.2, {y:0, x:0}));
 	},
 	updateCoins:function(){
 		this.coinsLabel.setText(APP.points);

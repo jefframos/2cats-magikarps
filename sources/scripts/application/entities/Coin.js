@@ -21,6 +21,10 @@ var Coin = Entity.extend({
 	startScaleTween: function(){
 		TweenLite.from(this.getContent().scale, 0.3, {x:0, y:0, ease:'easeOutBack'});
 	},
+	randomPos: function(rangeMin, rangeMax){
+		var yDest = rangeMin + Math.random() * rangeMax;
+		TweenLite.to(this.getContent(), 0.5, {delay:0.2, y:yDest});
+	},
 	build: function(){
 
 		// this.sprite = new PIXI.Sprite.fromFrame(this.imgSource);
@@ -51,6 +55,29 @@ var Coin = Entity.extend({
 	update: function(){
 		this.range = this.spriteBall.width / 2;
 		this._super();
+	},
+	explode:function(){
+		for (var i = 10; i >= 0; i--) {
+
+			console.log('part');
+			var size = 8;
+			var tempParticle = new PIXI.Graphics();
+			tempParticle.beginFill(0xFFFFFF);
+			tempParticle.drawRect(-size/2,-size/2,size,size);
+			// this.spriteBall.drawCircle(0,0,windowHeight * 0.02);
+
+			var particle = new Particles({x: Math.random() * 10 - 5, y:Math.random() * 10 - 5}, 600, tempParticle, Math.random() * 0.05);
+			// particle.maxScale = this.getContent().scale.x / 2;
+            // particle.maxInitScale = particle.maxScale;
+			particle.build();
+			// particle.getContent().tint = 0xf5c30c;
+			// particle.gravity = 0.3 * Math.random();
+			particle.alphadecress = 0.008;
+			// particle.scaledecress = -0.005;
+			particle.setPosition(this.getPosition().x - (Math.random() + this.getContent().width * 0.4) + this.getContent().width * 0.2,
+                this.getPosition().y - (Math.random() + this.getContent().width * 0.4)+ this.getContent().width * 0.2);
+			this.layer.addChild(particle);
+		}
 	},
 	preKill:function(){
 		if(this.invencible){

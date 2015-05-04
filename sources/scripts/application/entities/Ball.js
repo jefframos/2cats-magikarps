@@ -89,6 +89,14 @@ var Ball = Entity.extend({
 		this.gravity = 0;
 		this.velocity.y = - force;
 	},
+	improveGravity: function(){
+		if(this.gravityVal >= 1){
+			return;
+		}
+		
+		this.gravityVal += 0.01;
+		// console.log(this.gravityVal);
+	},
 	update: function(){
 		this._super();
 		if(!this.blockCollide){

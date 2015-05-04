@@ -1,4 +1,4 @@
-/*! jefframos 22-04-2015 */
+/*! jefframos 04-05-2015 */
 function rgbToHsl(r, g, b) {
     r /= 255, g /= 255, b /= 255;
     var h, s, max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2;
@@ -782,6 +782,9 @@ var Application = AbstractApplication.extend({
     jump: function(force) {
         return this.breakJump ? void this.screen.miss() : (this.gravity = 0, void (this.velocity.y = -force));
     },
+    improveGravity: function() {
+        this.gravityVal >= 1 || (this.gravityVal += .01);
+    },
     update: function() {
         this._super(), this.blockCollide || this.layer.collideChilds(this), this.range = this.spriteBall.height / 2, 
         this.getContent().position.y + this.velocity.y >= this.floorPos ? (this.velocity.y = 0, 
@@ -866,6 +869,13 @@ var Application = AbstractApplication.extend({
             ease: "easeOutBack"
         });
     },
+    randomPos: function(rangeMin, rangeMax) {
+        var yDest = rangeMin + Math.random() * rangeMax;
+        TweenLite.to(this.getContent(), .5, {
+            delay: .2,
+            y: yDest
+        });
+    },
     build: function() {
         this.spriteBall = new PIXI.Graphics(), this.spriteBall.beginFill(16777215);
         var size = .05 * windowHeight;
@@ -878,6 +888,19 @@ var Application = AbstractApplication.extend({
     },
     update: function() {
         this.range = this.spriteBall.width / 2, this._super();
+    },
+    explode: function() {
+        for (var i = 10; i >= 0; i--) {
+            console.log("part");
+            var size = 8, tempParticle = new PIXI.Graphics();
+            tempParticle.beginFill(16777215), tempParticle.drawRect(-size / 2, -size / 2, size, size);
+            var particle = new Particles({
+                x: 10 * Math.random() - 5,
+                y: 10 * Math.random() - 5
+            }, 600, tempParticle, .05 * Math.random());
+            particle.build(), particle.alphadecress = .008, particle.setPosition(this.getPosition().x - (Math.random() + .4 * this.getContent().width) + .2 * this.getContent().width, this.getPosition().y - (Math.random() + .4 * this.getContent().width) + .2 * this.getContent().width), 
+            this.layer.addChild(particle);
+        }
     },
     preKill: function() {
         if (!this.invencible) {
@@ -2097,8 +2120,8 @@ var Application = AbstractApplication.extend({
         this.levelCounter < 0 && (this.levelCounter = 0);
     },
     shoot: function(force) {
-        this.player.inError || (this.startLevel = !0, this.player.jump(force), this.force = 0, 
-        0 !== this.tapToPlay.alpha && (TweenLite.to(this.tapToPlay, .2, {
+        this.player.inError || (this.startLevel = !0, this.player.jump(force), this.player.improveGravity(), 
+        this.force = 0, 0 !== this.tapToPlay.alpha && (TweenLite.to(this.tapToPlay, .2, {
             alpha: 0
         }), TweenLite.to(this.loaderBar.getContent(), .2, {
             delay: .2,
@@ -2109,7 +2132,7 @@ var Application = AbstractApplication.extend({
         this.destroy(), this.build();
     },
     update: function() {
-        this.updateable && (this.player.inError || (this.tapDown && this.force < 16 && (this.force += .75, 
+        this.updateable && (this.player.inError || (this.tapDown && this.force < 30 && (this.force += .75, 
         this.player.charge()), this.startLevel && (this.levelCounter--, this.levelCounter < 0 && (this.levelCounter = 0))), 
         this.levelCounter <= 0 && this.gameOver(), this.loaderBar.updateBar(this.levelCounter, this.levelCounterMax), 
         this._super());
@@ -2127,11 +2150,26 @@ var Application = AbstractApplication.extend({
         }));
         perfect.maxScale = this.player.getContent().scale.x, perfect.build(), perfect.gravity = -.2, 
         perfect.alphadecress = .04, perfect.scaledecress = .05, perfect.setPosition(this.player.getPosition().x, this.player.getPosition().y + 50), 
-        this.layer.addChild(perfect), this.levelCounter += .02 * this.levelCounterMax, this.levelCounter > this.levelCounterMax && (this.levelCounter = this.levelCounterMax);
+        this.layer.addChild(perfect), this.levelCounter += .02 * this.levelCounterMax, this.levelCounter > this.levelCounterMax && (this.levelCounter = this.levelCounterMax), 
+        this.earthquake(20);
     },
     getCoin: function() {
         this.levelCounter += .1 * this.levelCounterMax, this.levelCounter > this.levelCounterMax && (this.levelCounter = this.levelCounterMax), 
-        this.updateCoins();
+        this.targetJump.randomPos(.05 * windowHeight, .4 * windowHeight), this.updateCoins(), 
+        this.targetJump.explode(), this.earthquake(5);
+    },
+    earthquake: function(force) {
+        var earth = new TimelineLite();
+        earth.append(TweenLite.to(this.container, .2, {
+            y: -Math.random() * force,
+            x: Math.random() * force - force / 2
+        })), earth.append(TweenLite.to(this.container, .2, {
+            y: -Math.random() * force,
+            x: Math.random() * force - force / 2
+        })), earth.append(TweenLite.to(this.container, .2, {
+            y: 0,
+            x: 0
+        }));
     },
     updateCoins: function() {
         this.coinsLabel.setText(APP.points), this.coinsLabel.position.x = windowWidth / 2 - this.coinsLabel.width / 2, 
@@ -2955,7 +2993,7 @@ var Application = AbstractApplication.extend({
 }), res = {
     x: 375,
     y: 667
-}, resizeProportional = !0, windowWidth = res.x, windowHeight = res.y, realWindowWidth = res.x, realWindowHeight = res.y, gameScale = 1.3, screenOrientation = "portait", windowWidthVar = window.innerHeight, windowHeightVar = window.innerWidth, gameView = document.getElementById("game");
+}, resizeProportional = !0, windowWidth = res.x, windowHeight = res.y, realWindowWidth = res.x, realWindowHeight = res.y, gameScale = 1, screenOrientation = "portait", windowWidthVar = window.innerHeight, windowHeightVar = window.innerWidth, gameView = document.getElementById("game");
 
 testMobile() || (document.body.className = ""), console.log(gameView), window.addEventListener("orientationchange", function() {
     window.scrollTo(0, 0);

@@ -13,7 +13,7 @@ var windowHeight = res.y;
 var realWindowWidth = res.x;
 var realWindowHeight = res.y;
 
-var gameScale = 1.3;
+var gameScale = 1;
 
 var screenOrientation = 'portait';
 
