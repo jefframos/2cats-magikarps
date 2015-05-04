@@ -107,15 +107,37 @@ function hexToRgb(hex){
     return {r:r,g:g,b:b};
 }
 
+function addHue(color, value){
+	var rgb = hexToRgb(color);
+	var hsl = rgbToHsl(rgb.r,rgb.g,rgb.b);
+	hsl.s *= value;
+	if(hsl.h > 1){
+		hsl.h = 1;
+	}
+	if(hsl.h < 0){
+		hsl.h = 0;
+	}
+	rgb = hslToRgb(hsl.h,hsl.s,hsl.l);
+	return rgbToHex(rgb.r,rgb.g,rgb.b);
+}
+
+function setSaturation(color, value){
+	var rgb = hexToRgb(color);
+	var hsl = rgbToHsl(rgb.r,rgb.g,rgb.b);
+	hsl.s = value;
+	rgb = hslToRgb(hsl.h,hsl.s,hsl.l);
+	return rgbToHex(rgb.r,rgb.g,rgb.b);
+}
+
 function addSaturation(color, value){
 	var rgb = hexToRgb(color);
 	var hsl = rgbToHsl(rgb.r,rgb.g,rgb.b);
 	hsl.s *= value;
 	if(hsl.s > 1){
-		hsl.s = 1;
+		hsl.s = 0;
 	}
 	if(hsl.s < 0){
-		hsl.s = 0;
+		hsl.s = 1;
 	}
 	rgb = hslToRgb(hsl.h,hsl.s,hsl.l);
 	return rgbToHex(rgb.r,rgb.g,rgb.b);

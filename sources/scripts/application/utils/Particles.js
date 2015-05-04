@@ -28,6 +28,7 @@ var Particles = Entity.extend({
         this.maxScale = 1;
         this.growType = 1;
         this.maxInitScale = 1;
+        this.initScale = 1;
 
     },
     build: function(){
@@ -41,8 +42,8 @@ var Particles = Entity.extend({
             this.sprite.anchor.y = 0.5;
         }
         this.sprite.alpha = 1;
-        this.sprite.scale.x = this.maxScale * this.maxInitScale;
-        this.sprite.scale.y = this.maxScale * this.maxInitScale;
+        this.sprite.scale.x = this.initScale;//this.maxScale * this.maxInitScale;
+        this.sprite.scale.y = this.initScale;//this.maxScale * this.maxInitScale;
         if(this.growType === -1){
             this.sprite.scale.x = this.maxScale;
             this.sprite.scale.y = this.maxScale;

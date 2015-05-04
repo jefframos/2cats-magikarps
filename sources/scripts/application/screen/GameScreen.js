@@ -31,6 +31,12 @@ var GameScreen = AbstractScreen.extend({
 	initApplication:function(){
 		var self = this;
 	   
+		this.background = new PIXI.Graphics();
+		this.background.beginFill(0xFFFFFF);
+		this.background.tint = 0x452E69;
+		this.background.drawRect(0,0,windowWidth, windowHeight);
+		this.addChild(this.background);
+
 		this.hitTouch = new PIXI.Graphics();
 		this.hitTouch.interactive = true;
 		this.hitTouch.beginFill(0);
@@ -115,8 +121,9 @@ var GameScreen = AbstractScreen.extend({
 
 
 
-		this.coinsLabel = new PIXI.Text('0', {align:'center',font:'80px Vagron', fill:'#5E4487', wordWrap:true, wordWrapWidth:500});
+		this.coinsLabel = new PIXI.Text('0', {align:'center',font:'80px Vagron', fill:'#FFFFFF', wordWrap:true, wordWrapWidth:500});
 		scaleConverter(this.coinsLabel.height, windowHeight, 0.2, this.coinsLabel);
+		this.coinsLabel.alpha = 0.3;
 		this.addChild(this.coinsLabel);
 
 		this.tapToPlay = new PIXI.Text('TAP AND HOLD TO PLAY', {align:'center',font:'30px Vagron', fill:'#5E4487', wordWrap:true, wordWrapWidth:500});
@@ -126,27 +133,41 @@ var GameScreen = AbstractScreen.extend({
 		this.tapToPlay.position.x = windowWidth / 2 - this.tapToPlay.width / 2;
 		this.addChild(this.tapToPlay);
 
-		this.loaderBar = new LifeBarHUD(windowWidth * 0.6, 20, 0, 0xf5c30c, 0xFF453c);
-        this.addChild(this.loaderBar.getContent());
-        this.loaderBar.getContent().position.x = windowWidth / 2 - this.loaderBar.getContent().width / 2;
-        this.loaderBar.getContent().position.y = windowHeight / 1.1;
-        this.loaderBar.updateBar(0, 100);
-        this.loaderBar.getContent().alpha = 0;
+		this.loaderBar = new LifeBarHUD(windowWidth * 0.6, 20, 0, 0xFFFFFF, 0xFFFFFF);
+		this.addChild(this.loaderBar.getContent());
+		this.loaderBar.getContent().position.x = windowWidth / 2 - this.loaderBar.getContent().width / 2;
+		this.loaderBar.getContent().position.y = windowHeight / 1.1;
+		this.loaderBar.updateBar(0, 100);
+		this.loaderBar.getContent().alpha = 0;
 
 		this.initLevel();
 		this.startLevel = false;
 		
 	},
 	miss:function() {
-		var errou = new Particles({x: 0, y:0}, 120, new PIXI.Text('ERROU!', {font:'50px Vagron', fill:'#f5c30c'}));
+		var rot = Math.random() * 0.004;
+		var tempLabel = new PIXI.Text('ERROU', {font:'50px Vagron', fill:'#ec8b78'});
+
+		var errou = new Particles({x: 0, y:0}, 120, tempLabel,rot);
 		errou.maxScale = this.player.getContent().scale.x;
 		errou.build();
 		// errou.getContent().tint = 0xf5c30c;
-		errou.gravity = -0.2;
-		errou.alphadecress = 0.04;
+		errou.gravity = 0.2;
+		errou.alphadecress = 0.01;
 		errou.scaledecress = +0.05;
-		errou.setPosition(this.player.getPosition().x, this.player.getPosition().y);
+		errou.setPosition(this.player.getPosition().x - tempLabel.width / 2, this.player.getPosition().y - 50);
 		this.layer.addChild(errou);
+
+		var errou2 = new Particles({x: 0, y:0}, 120, new PIXI.Text('ERROU', {font:'50px Vagron', fill:'#d41819'}),-rot);
+		errou2.maxScale = this.player.getContent().scale.x;
+		errou2.build();
+		// errou2.getContent().tint = 0xf5c30c;
+		errou2.gravity = 0.2;
+		errou2.alphadecress = 0.01;
+		errou2.scaledecress = +0.05;
+		errou2.setPosition(this.player.getPosition().x - tempLabel.width / 2+2, this.player.getPosition().y - 50+2);
+		this.layer.addChild(errou2);
+
 
 		this.player.inError = true;
 		this.levelCounter -= this.levelCounterMax * 0.1;
@@ -200,21 +221,34 @@ var GameScreen = AbstractScreen.extend({
 		this.reset();
 	},
 	getPerfect:function(){
-		var perfect = new Particles({x: 0, y:0}, 120, new PIXI.Text('PERFECT!', {font:'50px Vagron', fill:'#f5c30c'}));
+		var rot = Math.random() * 0.004;
+		var tempLabel = new PIXI.Text('PERFECT!', {font:'50px Vagron', fill:'#9d47e0'});
+
+		var perfect = new Particles({x: 0, y:0}, 120, tempLabel,rot);
 		perfect.maxScale = this.player.getContent().scale.x;
 		perfect.build();
 		// perfect.getContent().tint = 0xf5c30c;
 		perfect.gravity = -0.2;
-		perfect.alphadecress = 0.04;
+		perfect.alphadecress = 0.01;
 		perfect.scaledecress = +0.05;
-		perfect.setPosition(this.player.getPosition().x, this.player.getPosition().y + 50);
+		perfect.setPosition(this.player.getPosition().x - tempLabel.width / 2, this.player.getPosition().y + 50);
 		this.layer.addChild(perfect);
+
+		var perfect2 = new Particles({x: 0, y:0}, 120, new PIXI.Text('PERFECT!', {font:'50px Vagron', fill:'#13c2b6'}),-rot);
+		perfect2.maxScale = this.player.getContent().scale.x;
+		perfect2.build();
+		// perfect2.getContent().tint = 0xf5c30c;
+		perfect2.gravity = -0.2;
+		perfect2.alphadecress = 0.01;
+		perfect2.scaledecress = +0.05;
+		perfect2.setPosition(this.player.getPosition().x - tempLabel.width / 2 + 2, this.player.getPosition().y + 50 + 2);
+		this.layer.addChild(perfect2);
 
 		this.levelCounter += this.levelCounterMax * 0.02;
 		if(this.levelCounter > this.levelCounterMax){
 			this.levelCounter = this.levelCounterMax;
 		}
-		this.earthquake(20);
+		this.earthquake(40);
 	},
 	getCoin:function(){
 		this.levelCounter += this.levelCounterMax * 0.1;
@@ -224,7 +258,20 @@ var GameScreen = AbstractScreen.extend({
 		this.targetJump.randomPos(windowHeight * 0.05, windowHeight * 0.4);
 		this.updateCoins();
 		this.targetJump.explode();
-		this.earthquake(5);
+		this.earthquake(20);
+		this.changeColor();
+	},
+	changeColor:function(){
+		var tempColor = this.background.tint;
+		this.background.tint = 0xFFFFFF;
+		tempColor = addHue(tempColor, (Math.random() - 0.5) * 5);
+		tempColor = setSaturation(tempColor, 0.2);
+		tempColor = addHue(tempColor, (Math.random() - 0.5) * 10);
+		TweenLite.to(this.background, 0.3, {tint:tempColor});
+
+		tempColor = addBright(tempColor, 0.5);
+		this.player.spriteBall.tint = tempColor;
+		this.loaderBar.backBaseShape.tint = tempColor;//tempColor;
 	},
 	earthquake:function(force){
 		var earth = new TimelineLite();
@@ -236,7 +283,7 @@ var GameScreen = AbstractScreen.extend({
 		this.coinsLabel.setText(APP.points);
 		this.coinsLabel.position.x = windowWidth / 2 - this.coinsLabel.width / 2;
 		this.coinsLabel.position.y = windowHeight / 2 - this.coinsLabel.height / 2;
-		this.coinsLabel.parent.setChildIndex(this.coinsLabel, 0);
+		this.coinsLabel.parent.setChildIndex(this.coinsLabel, 1);
 	},
 	initLevel:function(whereInit){
 		this.player = new Ball({x:0,y:0}, this);
@@ -257,8 +304,8 @@ var GameScreen = AbstractScreen.extend({
 		TweenLite.to(this.tapToPlay, 0.5, {alpha:1});
 
 		this.force = 0;
-        this.levelCounter = 800;
-        this.levelCounterMax = 800;
+		this.levelCounter = 800;
+		this.levelCounterMax = 800;
 
 		APP.points = 0;
 

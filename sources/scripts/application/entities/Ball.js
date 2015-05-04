@@ -159,6 +159,7 @@ var Ball = Entity.extend({
             //efeito 3
             var particle = new Particles({x: Math.random() * 4 - 2, y:Math.random()}, 120, this.particleSource, Math.random() * 0.05);
             particle.maxScale = this.getContent().scale.x / 2;
+            particle.initScale = this.getContent().scale.x / 10;
             // particle.maxInitScale = particle.maxScale / 1.5;
             // particle.growType = -1;
             particle.build();
@@ -206,15 +207,44 @@ var Ball = Entity.extend({
 					this.blockCollide = true;
 					var value = 1 + this.perfectShootAcum;
 					APP.points += value;
-					var labelCoin = new Particles({x: 0, y:0}, 120, new PIXI.Text('+'+value, {font:'50px Vagron', fill:'#f5c30c'}));
+
+
+
+					var rot = Math.random() * 0.005;
+					var tempLabel = new PIXI.Text('+'+value, {font:'50px Vagron', fill:'#13c2b6'});
+					// var tempLabel = new PIXI.Text('+'+value, {font:'50px Vagron', fill:'#9d47e0'});
+
+					var labelCoin = new Particles({x: 0, y:0}, 120, tempLabel,rot);
 					labelCoin.maxScale = this.getContent().scale.x;
 					labelCoin.build();
 					// labelCoin.getContent().tint = 0xf5c30c;
 					labelCoin.gravity = -0.2;
-					labelCoin.alphadecress = 0.04;
+					labelCoin.alphadecress = 0.01;
 					labelCoin.scaledecress = +0.05;
-					labelCoin.setPosition(this.getPosition().x, this.getPosition().y);
+					labelCoin.setPosition(this.getPosition().x - tempLabel.width / 2, this.getPosition().y);
 					this.screen.layer.addChild(labelCoin);
+
+					var labelCoin2 = new Particles({x: 0, y:0}, 120, new PIXI.Text('+'+value, {font:'50px Vagron', fill:'#9d47e0'}),-rot);
+					// var labelCoin2 = new Particles({x: 0, y:0}, 120, new PIXI.Text('+'+value, {font:'50px Vagron', fill:'#13c2b6'}),-rot);
+					labelCoin2.maxScale = this.getContent().scale.x;
+					labelCoin2.build();
+					// labelCoin2.getContent().tint = 0xf5c30c;
+					labelCoin2.gravity = -0.2;
+					labelCoin2.alphadecress = 0.01;
+					labelCoin2.scaledecress = +0.05;
+					labelCoin2.setPosition(this.getPosition().x - tempLabel.width / 2+2, this.getPosition().y+2);
+					this.screen.layer.addChild(labelCoin2);
+
+
+					// var labelCoin = new Particles({x: 0, y:0}, 120, new PIXI.Text('+'+value, {font:'50px Vagron', fill:'#f5c30c'}));
+					// labelCoin.maxScale = this.getContent().scale.x;
+					// labelCoin.build();
+					// // labelCoin.getContent().tint = 0xf5c30c;
+					// labelCoin.gravity = -0.2;
+					// labelCoin.alphadecress = 0.04;
+					// labelCoin.scaledecress = +0.05;
+					// labelCoin.setPosition(this.getPosition().x, this.getPosition().y);
+					// this.screen.layer.addChild(labelCoin);
 
 					this.screen.getCoin();
 				}
@@ -237,6 +267,7 @@ var Ball = Entity.extend({
 		tempPart.beginFill(0xFFFFFF);
 		tempPart.drawCircle(0,0,windowHeight * 0.05);
 		var particle = new Particles(vecVel, 800, tempPart, 0);
+		particle.initScale = this.getContent().scale.x / 10;
         particle.maxScale = this.getContent().scale.x / 3;
         // particle.maxInitScale = particle.maxScale / 1.5;
         // particle.growType = -1;
