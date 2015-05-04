@@ -32,7 +32,7 @@ var GameScreen = AbstractScreen.extend({
 		var self = this;
 	   
 		this.vecColors = [0xFFCE62,0xE87C1E,0xFF562D,0xE81E55,0xE621FF];
-		this.vecPerfects = ['PERFECT!', 'AWESOME!', 'AMAZING!', 'GOD!'];
+		this.vecPerfects = ['PERFECT!', 'AWESOME!', 'AMAZING!', 'GOD!!!'];
 		this.vecGood = ['GOOD', 'COOL', 'YO', 'NOT BAD'];
 		this.vecError = ['NOOOO!', 'BAD', '=(', 'NOT'];
 		this.backColor = 0x452E69;
@@ -115,6 +115,7 @@ var GameScreen = AbstractScreen.extend({
 
 		this.brilhoBase = new SimpleSprite('baseDegrade.png');
 		this.container.addChild(this.brilhoBase.getContent());
+		this.brilhoBase.getContent().alpha = 0.5;
 		scaleConverter(this.brilhoBase.getContent().width, windowWidth, 1, this.brilhoBase);
 		this.brilhoBase.getContent().position.x = windowWidth / 2 - this.brilhoBase.getContent().width / 2;
 		
@@ -133,7 +134,7 @@ var GameScreen = AbstractScreen.extend({
 
 
 
-		this.coinsLabel = new PIXI.Text('0', {align:'center',font:'80px Vagron', fill:'#FFFFFF', wordWrap:true, wordWrapWidth:500});
+		this.coinsLabel = new PIXI.Text('0', {align:'center',font:'72px Vagron', fill:'#FFFFFF', wordWrap:true, wordWrapWidth:500});
 		scaleConverter(this.coinsLabel.height, windowHeight, 0.2, this.coinsLabel);
 		this.coinsLabel.alpha = 0.5;
 		this.addChild(this.coinsLabel);
@@ -201,7 +202,7 @@ var GameScreen = AbstractScreen.extend({
 		this.player.velocity.y = 0;
 		var wrongLabel = this.vecError[Math.floor(this.vecError.length * Math.random())];
 		var rot = Math.random() * 0.004;
-		var tempLabel = new PIXI.Text(wrongLabel, {font:'50px Vagron', fill:'#ec8b78'});
+		var tempLabel = new PIXI.Text(wrongLabel, {font:'30px Vagron', fill:'#ec8b78'});
 
 		var errou = new Particles({x: 0, y:0}, 120, tempLabel,rot);
 		errou.maxScale = this.player.getContent().scale.x;
@@ -213,7 +214,7 @@ var GameScreen = AbstractScreen.extend({
 		errou.setPosition(this.player.getPosition().x - tempLabel.width / 2, this.player.getPosition().y - 50);
 		this.layer.addChild(errou);
 
-		var errou2 = new Particles({x: 0, y:0}, 120, new PIXI.Text(wrongLabel, {font:'50px Vagron', fill:'#e25a30'}),-rot);
+		var errou2 = new Particles({x: 0, y:0}, 120, new PIXI.Text(wrongLabel, {font:'30px Vagron', fill:'#c01f2e'}),-rot);
 		errou2.maxScale = this.player.getContent().scale.x;
 		errou2.build();
 		// errou2.getContent().tint = 0xf5c30c;
@@ -321,7 +322,7 @@ var GameScreen = AbstractScreen.extend({
 		this.earthquake(40);
 	},
 	getCoin:function(isPerfect){
-		this.levelCounter += this.levelCounterMax * 0.05;
+		this.levelCounter += this.levelCounterMax * 0.03;
 		if(this.levelCounter > this.levelCounterMax){
 			this.levelCounter = this.levelCounterMax;
 		}
@@ -330,7 +331,7 @@ var GameScreen = AbstractScreen.extend({
 		this.targetJump.explode();
 
 		if(!isPerfect){
-			this.addRegularLabel(this.vecGood[Math.floor(this.vecGood.length * Math.random())], '40px Vagron');
+			this.addRegularLabel(this.vecGood[Math.floor(this.vecGood.length * Math.random())], '30px Vagron');
 		}
 
 		this.earthquake(20);

@@ -782,7 +782,7 @@ var Application = AbstractApplication.extend({
             alpha: 1
         }), this.collideArea = new PIXI.Rectangle(-50, -50, windowWidth + 100, windowHeight + 100), 
         this.particlesCounterMax = 2, this.particlesCounter = 1, this.floorPos = windowHeight, 
-        this.gravity = 0, this.gravityVal = .3, this.breakJump = !1, this.blockCollide = !1, 
+        this.gravity = 0, this.gravityVal = .15, this.breakJump = !1, this.blockCollide = !1, 
         this.inError = !1, this.perfectShoot = 0, this.perfectShootAcum = 0, this.force = 0;
     },
     setFloor: function(pos) {
@@ -800,11 +800,11 @@ var Application = AbstractApplication.extend({
         });
     },
     jump: function(force) {
-        return this.breakJump ? void this.screen.miss() : (this.gravity = 0, this.velocity.y = -force, 
-        void (this.firstJump = !0));
+        return this.breakJump ? void this.screen.miss() : (this.gravity = 0, this.velocity.y = -force - this.gravityVal * this.gravityVal / 1.5 * 10, 
+        console.log(this.velocity.y, this.gravityVal), void (this.firstJump = !0));
     },
     improveGravity: function() {
-        this.gravityVal >= 1 || (this.gravityVal += .01);
+        this.gravityVal >= 1.5 || (this.gravityVal += .05);
     },
     update: function() {
         this._super(), this.blockCollide || this.layer.collideChilds(this), this.spriteBall.width = this.force + this.maxSize - Math.abs(this.velocity.y), 
@@ -2148,7 +2148,7 @@ var Application = AbstractApplication.extend({
     },
     initApplication: function() {
         var self = this;
-        this.vecColors = [ 16764514, 15236126, 16733741, 15212117, 15081983 ], this.vecPerfects = [ "PERFECT!", "AWESOME!", "AMAZING!", "GOD!" ], 
+        this.vecColors = [ 16764514, 15236126, 16733741, 15212117, 15081983 ], this.vecPerfects = [ "PERFECT!", "AWESOME!", "AMAZING!", "GOD!!!" ], 
         this.vecGood = [ "GOOD", "COOL", "YO", "NOT BAD" ], this.vecError = [ "NOOOO!", "BAD", "=(", "NOT" ], 
         this.backColor = 4533865, this.background = new PIXI.Graphics(), this.background.beginFill(this.backColor), 
         this.interactiveBackground = new InteractiveBackground(this), this.interactiveBackground.build(), 
@@ -2179,13 +2179,13 @@ var Application = AbstractApplication.extend({
         }, function() {
             self.pauseModal.hide();
         }), this.brilhoBase = new SimpleSprite("baseDegrade.png"), this.container.addChild(this.brilhoBase.getContent()), 
-        scaleConverter(this.brilhoBase.getContent().width, windowWidth, 1, this.brilhoBase), 
+        this.brilhoBase.getContent().alpha = .5, scaleConverter(this.brilhoBase.getContent().width, windowWidth, 1, this.brilhoBase), 
         this.brilhoBase.getContent().position.x = windowWidth / 2 - this.brilhoBase.getContent().width / 2, 
         this.layerManager = new LayerManager(), this.layerManager.build("Main"), this.addChild(this.layerManager), 
         this.layer = new Layer(), this.layer.build("EntityLayer"), this.layerManager.addLayer(this.layer), 
         this.coinsLabel = new PIXI.Text("0", {
             align: "center",
-            font: "80px Vagron",
+            font: "72px Vagron",
             fill: "#FFFFFF",
             wordWrap: !0,
             wordWrapWidth: 500
@@ -2241,7 +2241,7 @@ var Application = AbstractApplication.extend({
     miss: function() {
         this.player.breakJump = !0, this.player.velocity.y = 0;
         var wrongLabel = this.vecError[Math.floor(this.vecError.length * Math.random())], rot = .004 * Math.random(), tempLabel = new PIXI.Text(wrongLabel, {
-            font: "50px Vagron",
+            font: "30px Vagron",
             fill: "#ec8b78"
         }), errou = new Particles({
             x: 0,
@@ -2254,8 +2254,8 @@ var Application = AbstractApplication.extend({
             x: 0,
             y: 0
         }, 120, new PIXI.Text(wrongLabel, {
-            font: "50px Vagron",
-            fill: "#e25a30"
+            font: "30px Vagron",
+            fill: "#c01f2e"
         }), -rot);
         errou2.maxScale = this.player.getContent().scale.x, errou2.build(), errou2.gravity = .1, 
         errou2.alphadecress = .01, errou2.scaledecress = .05, errou2.setPosition(this.player.getPosition().x - tempLabel.width / 2 + 2, this.player.getPosition().y - 50 + 2), 
@@ -2311,9 +2311,9 @@ var Application = AbstractApplication.extend({
         this.earthquake(40);
     },
     getCoin: function(isPerfect) {
-        this.levelCounter += .05 * this.levelCounterMax, this.levelCounter > this.levelCounterMax && (this.levelCounter = this.levelCounterMax), 
+        this.levelCounter += .03 * this.levelCounterMax, this.levelCounter > this.levelCounterMax && (this.levelCounter = this.levelCounterMax), 
         this.targetJump.randomPos(.05 * windowHeight, .4 * windowHeight), this.updateCoins(), 
-        this.targetJump.explode(), isPerfect || this.addRegularLabel(this.vecGood[Math.floor(this.vecGood.length * Math.random())], "40px Vagron"), 
+        this.targetJump.explode(), isPerfect || this.addRegularLabel(this.vecGood[Math.floor(this.vecGood.length * Math.random())], "30px Vagron"), 
         this.earthquake(20), this.changeColor();
     },
     changeColor: function(force) {

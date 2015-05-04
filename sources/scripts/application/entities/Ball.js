@@ -64,7 +64,7 @@ var Ball = Entity.extend({
         // this.sprite.setChildIndex(this.shadow , 0);
         this.floorPos = windowHeight;
         this.gravity = 0;
-        this.gravityVal = 0.3;
+        this.gravityVal = 0.15;
         this.breakJump = false;
         this.blockCollide = false;
         this.inError = false;
@@ -91,15 +91,16 @@ var Ball = Entity.extend({
 			return;
 		}
 		this.gravity = 0;
-		this.velocity.y = - force;
+		this.velocity.y = - force - ((this.gravityVal * this.gravityVal) / 1.5) * 10;
+		console.log(this.velocity.y, this.gravityVal);
 		this.firstJump = true;
 	},
 	improveGravity: function(){
-		if(this.gravityVal >= 1){
+		if(this.gravityVal >= 1.5){
 			return;
 		}
 		
-		this.gravityVal += 0.01;
+		this.gravityVal += 0.05;
 		// console.log(this.gravityVal);
 	},
 	update: function(){
