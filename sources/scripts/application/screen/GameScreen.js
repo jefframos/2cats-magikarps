@@ -31,9 +31,14 @@ var GameScreen = AbstractScreen.extend({
 	initApplication:function(){
 		var self = this;
 	   
+		this.vecColors = [0x578940,0xd730a4,0xde8366,0x23dfce,0xa84dd8,0x2b5527];
+		this.backColor = 0x452E69;
 		this.background = new PIXI.Graphics();
-		this.background.beginFill(0xFFFFFF);
-		this.background.tint = 0x452E69;
+		this.background.beginFill(this.backColor);
+
+		// this.changeColor();
+		// this.background.alpha = 0;
+
 		this.background.drawRect(0,0,windowWidth, windowHeight);
 		this.addChild(this.background);
 
@@ -145,6 +150,9 @@ var GameScreen = AbstractScreen.extend({
 		
 	},
 	miss:function() {
+		this.player.breakJump = true;
+		this.player.velocity.y = 0;
+
 		var rot = Math.random() * 0.004;
 		var tempLabel = new PIXI.Text('ERROU', {font:'50px Vagron', fill:'#ec8b78'});
 
@@ -152,7 +160,7 @@ var GameScreen = AbstractScreen.extend({
 		errou.maxScale = this.player.getContent().scale.x;
 		errou.build();
 		// errou.getContent().tint = 0xf5c30c;
-		errou.gravity = 0.2;
+		errou.gravity = 0.1;
 		errou.alphadecress = 0.01;
 		errou.scaledecress = +0.05;
 		errou.setPosition(this.player.getPosition().x - tempLabel.width / 2, this.player.getPosition().y - 50);
@@ -162,7 +170,7 @@ var GameScreen = AbstractScreen.extend({
 		errou2.maxScale = this.player.getContent().scale.x;
 		errou2.build();
 		// errou2.getContent().tint = 0xf5c30c;
-		errou2.gravity = 0.2;
+		errou2.gravity = 0.1;
 		errou2.alphadecress = 0.01;
 		errou2.scaledecress = +0.05;
 		errou2.setPosition(this.player.getPosition().x - tempLabel.width / 2+2, this.player.getPosition().y - 50+2);
@@ -199,8 +207,8 @@ var GameScreen = AbstractScreen.extend({
 		}
 		if(!this.player.inError){
 			if(this.tapDown && this.force < 30){
-				this.force += 0.75;
-				
+				this.force += 0.9;
+				this.player.charge();
 				// console.log(this.force);
 			}
 			// console.log(this.startLevel);
@@ -252,7 +260,7 @@ var GameScreen = AbstractScreen.extend({
 		this.earthquake(40);
 	},
 	getCoin:function(){
-		this.levelCounter += this.levelCounterMax * 0.1;
+		this.levelCounter += this.levelCounterMax * 0.05;
 		if(this.levelCounter > this.levelCounterMax){
 			this.levelCounter = this.levelCounterMax;
 		}
@@ -262,19 +270,28 @@ var GameScreen = AbstractScreen.extend({
 		this.earthquake(20);
 		this.changeColor();
 	},
-	changeColor:function(){
-		var tempColor = this.background.tint;
-		this.background.tint = 0xFFFFFF;
-		tempColor = addHue(tempColor, (Math.random() - 0.5) * 5);
-		tempColor = setSaturation(tempColor, 0.2);
-		tempColor = addHue(tempColor, 0.9);
-		TweenLite.to(this.background, 0.3, {tint:tempColor});
-		// this.background.tint = tempColor;
-		// alert(tempColor);
+	changeColor:function(force){
+		var tempColor = 0;
+		var self = this;
+		var temptempColor = this.vecColors[Math.floor(this.vecColors.length * Math.random())];
 
-		tempColor = addBright(tempColor, 0.5);
-		this.player.spriteBall.tint = tempColor;
-		this.loaderBar.backBaseShape.tint = tempColor;//tempColor;
+		if(force){
+			self.background.clear();
+			self.background.beginFill(temptempColor);
+			self.background.drawRect(-80,-80,windowWidth + 160, windowHeight + 160);
+		}else{
+			TweenLite.to(this, 0.3, {backColor:temptempColor, onUpdate:function(){
+				self.background.clear();
+				self.background.beginFill(self.backColor);
+				self.background.drawRect(-80,-80,windowWidth + 160, windowHeight + 160);
+			}});
+		}
+
+		tempColor = addBright(temptempColor, 0.5);
+		// this.player.spriteBall.tint = tempColor;
+		this.player.setColor(tempColor);
+		this.loaderBar.setBackColor(tempColor);
+		// this.loaderBar.backBaseShape.tint = tempColor;//tempColor;
 	},
 	earthquake:function(force){
 		var earth = new TimelineLite();
@@ -286,6 +303,7 @@ var GameScreen = AbstractScreen.extend({
 		this.coinsLabel.setText(APP.points);
 		this.coinsLabel.position.x = windowWidth / 2 - this.coinsLabel.width / 2;
 		this.coinsLabel.position.y = windowHeight / 2 - this.coinsLabel.height / 2;
+		this.background.parent.setChildIndex(this.background, 0);
 		this.coinsLabel.parent.setChildIndex(this.coinsLabel, 1);
 	},
 	initLevel:function(whereInit){
@@ -313,7 +331,7 @@ var GameScreen = AbstractScreen.extend({
 		APP.points = 0;
 
 		this.updateCoins();
-
+		this.changeColor(true);
 	},
 	
 	transitionIn:function()

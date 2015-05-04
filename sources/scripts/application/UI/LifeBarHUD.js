@@ -6,6 +6,7 @@ var LifeBarHUD = Class.extend({
 		this.container = new PIXI.DisplayObjectContainer();
 		this.width = width;
 		this.height = height;
+		this.incX = incX;
 		this.backShape = new PIXI.Graphics();
 
 		// this.rect = [[0,14],[102,0],[106,20],[4,34]];
@@ -98,6 +99,20 @@ var LifeBarHUD = Class.extend({
 		// this.frontShape.mask = this.mask;
 		this.backFrontShape.mask = this.backMask;
 
+	},
+	setBackColor: function(color){
+		var acc = this.height;
+		var xAcc2 = this.incX;
+		this.baseRect = [this.rect[3], this.rect[2], [this.rect[2][0] - xAcc2,this.rect[2][1] + acc], [this.rect[3][0] - xAcc2,this.rect[3][1] + acc]];
+		this.baseFrontRect = [this.rect[3], this.rect[2], [this.rect[2][0] - xAcc2,this.rect[2][1] + acc], [this.rect[3][0] - xAcc2,this.rect[3][1] + acc]];
+
+		this.backBaseShape.clear();
+		this.backBaseShape.beginFill(color);
+		this.backBaseShape.moveTo(this.baseRect[0][0],this.baseRect[0][1]);
+		for (i = 1; i < this.baseRect.length; i++) {
+			this.backBaseShape.lineTo(this.baseRect[i][0],this.baseRect[i][1]);
+		}
+		this.backBaseShape.endFill();
 	},
 	setText: function(text){
 		if(this.text !== text){

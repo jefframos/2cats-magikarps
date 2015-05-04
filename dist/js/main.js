@@ -334,8 +334,8 @@ var Application = AbstractApplication.extend({
             self._super(windowWidth, windowHeight), self.stage.setBackgroundColor(4533865), 
             self.stage.removeChild(self.loadText), self.labelDebug = new PIXI.Text("", {
                 font: "15px Arial"
-            }), self.labelDebug.position.y = windowHeight - 20, self.labelDebug.position.x = 20, 
-            self.initialized = !0, self.withAPI = !1, "#withoutAPI" === window.location.hash && (self.withAPI = !1);
+            }), self.stage.addChild(self.labelDebug), self.labelDebug.position.y = windowHeight - 20, 
+            self.labelDebug.position.x = 20, self.initialized = !0, self.withAPI = !1, "#withoutAPI" === window.location.hash && (self.withAPI = !1);
         }
         var self = this;
         initialize();
@@ -500,7 +500,7 @@ var Application = AbstractApplication.extend({
 }), LifeBarHUD = Class.extend({
     init: function(width, height, incX, frontColor, baseColor) {
         this.text = "default", this.container = new PIXI.DisplayObjectContainer(), this.width = width, 
-        this.height = height, this.backShape = new PIXI.Graphics();
+        this.height = height, this.incX = incX, this.backShape = new PIXI.Graphics();
         var w = width, xAcc = 0;
         this.rect = [ [ 0, 0 ], [ w, 0 ], [ w + xAcc, 0 ], [ xAcc, 0 ] ], this.frontRect = [ [ 0, 0 ], [ w, 0 ], [ w + xAcc, 0 ], [ xAcc, 0 ] ];
         var i = 0, acc = height, xAcc2 = incX;
@@ -516,6 +516,14 @@ var Application = AbstractApplication.extend({
         this.backMask = new PIXI.Graphics(), this.backMask.beginFill(255), this.backMask.moveTo(this.baseRect[0][0], this.baseRect[0][1]), 
         i = 1; i < this.baseRect.length; i++) this.backMask.lineTo(this.baseRect[i][0], this.baseRect[i][1]);
         this.backMask.endFill(), this.container.addChild(this.backMask), this.backFrontShape.mask = this.backMask;
+    },
+    setBackColor: function(color) {
+        var acc = this.height, xAcc2 = this.incX;
+        for (this.baseRect = [ this.rect[3], this.rect[2], [ this.rect[2][0] - xAcc2, this.rect[2][1] + acc ], [ this.rect[3][0] - xAcc2, this.rect[3][1] + acc ] ], 
+        this.baseFrontRect = [ this.rect[3], this.rect[2], [ this.rect[2][0] - xAcc2, this.rect[2][1] + acc ], [ this.rect[3][0] - xAcc2, this.rect[3][1] + acc ] ], 
+        this.backBaseShape.clear(), this.backBaseShape.beginFill(color), this.backBaseShape.moveTo(this.baseRect[0][0], this.baseRect[0][1]), 
+        i = 1; i < this.baseRect.length; i++) this.backBaseShape.lineTo(this.baseRect[i][0], this.baseRect[i][1]);
+        this.backBaseShape.endFill();
     },
     setText: function(text) {
         this.text !== text && (this.lifebar ? this.lifebar.setText(text) : this.lifebar = new PIXI.Text(text, {
@@ -766,10 +774,11 @@ var Application = AbstractApplication.extend({
         });
     },
     build: function() {
-        this.spriteBall = new PIXI.Graphics(), this.spriteBall.beginFill(16777215), this.maxSize = .05 * windowHeight, 
-        this.spriteBall.drawCircle(0, 0, .05 * windowHeight - 30), this.sprite = new PIXI.Sprite(), 
-        this.sprite.addChild(this.spriteBall), this.sprite.anchor.x = .5, this.sprite.anchor.y = .5, 
-        this.updateable = !0, this.collidable = !0, this.getContent().alpha = .1, TweenLite.to(this.getContent(), .3, {
+        this.color = 16777215, this.spriteBall = new PIXI.Graphics(), this.spriteBall.beginFill(this.color), 
+        this.maxSize = .05 * windowHeight, this.spriteBall.drawCircle(0, 0, this.maxSize), 
+        this.sprite = new PIXI.Sprite(), this.sprite.addChild(this.spriteBall), this.sprite.anchor.x = .5, 
+        this.sprite.anchor.y = .5, this.updateable = !0, this.collidable = !0, this.getContent().alpha = .1, 
+        TweenLite.to(this.getContent(), .3, {
             alpha: 1
         }), this.collideArea = new PIXI.Rectangle(-50, -50, windowWidth + 100, windowHeight + 100), 
         this.particlesCounterMax = 2, this.particlesCounter = 1, this.floorPos = windowHeight, 
@@ -798,8 +807,8 @@ var Application = AbstractApplication.extend({
     },
     update: function() {
         this._super(), this.blockCollide || this.layer.collideChilds(this), this.range = this.spriteBall.height / 2, 
-        this.getContent().position.y + this.velocity.y >= this.floorPos - this.spriteBall.height / 2 ? (this.velocity.y = 0, 
-        this.gravity = 0, this.getContent().position.y = this.floorPos - this.spriteBall.height / 2, 
+        this.getContent().position.y + this.velocity.y >= this.floorPos - this.spriteBall.height / 2 + this.maxSize ? (this.velocity.y = 0, 
+        this.gravity = 0, this.getContent().position.y = this.floorPos - this.spriteBall.height / 2 + this.maxSize, 
         this.breakJump = !1, this.blockCollide = !1, this.inError = !1) : (this.velocity.y += this.gravityVal, 
         this.breakJump = !0), 0 !== this.velocity.y ? this.updateableParticles() : this.perfectShoot++, 
         this.spriteBall.width = this.force + this.maxSize, this.spriteBall.height = this.force + this.maxSize;
@@ -808,7 +817,7 @@ var Application = AbstractApplication.extend({
         if (this.particlesCounter--, this.particlesCounter <= 0) {
             this.particlesCounter = this.particlesCounterMax;
             var tempPart = new PIXI.Graphics();
-            tempPart.beginFill(this.spriteBall.tint), tempPart.drawCircle(0, 0, this.spriteBall.width);
+            tempPart.beginFill(this.color), tempPart.drawCircle(0, 0, this.spriteBall.width);
             var particle = new Particles({
                 x: 4 * Math.random() - 2,
                 y: Math.random()
@@ -850,6 +859,9 @@ var Application = AbstractApplication.extend({
             this.screen.layer.addChild(labelCoin2), this.screen.getCoin();
         }
     },
+    setColor: function(color) {
+        this.color = color, this.spriteBall.clear(), this.spriteBall.beginFill(color), this.spriteBall.drawCircle(0, 0, this.maxSize);
+    },
     charge: function(force) {
         var angle = degreesToRadians(360 * Math.random()), dist = .9 * this.spriteBall.height, pPos = {
             x: dist * Math.sin(angle) + this.getContent().position.x,
@@ -857,8 +869,10 @@ var Application = AbstractApplication.extend({
         }, vector = Math.atan2(this.getPosition().x - pPos.x, this.getPosition().y - pPos.y), vel = 2, vecVel = {
             x: Math.sin(vector) * vel,
             y: Math.cos(vector) * vel
-        }, tempPart = new PIXI.Graphics();
-        tempPart.beginFill(16777215), tempPart.drawCircle(0, 0, .05 * windowHeight);
+        };
+        console.log("charge");
+        var tempPart = new PIXI.Graphics();
+        tempPart.beginFill(this.color), tempPart.drawCircle(0, 0, .05 * windowHeight);
         var particle = new Particles(vecVel, 800, tempPart, 0);
         particle.initScale = this.getContent().scale.x / 10, particle.maxScale = this.getContent().scale.x / 3, 
         particle.build(), particle.gravity = 0, particle.scaledecress = -.01, particle.setPosition(pPos.x, pPos.y), 
@@ -2085,7 +2099,8 @@ var Application = AbstractApplication.extend({
     },
     initApplication: function() {
         var self = this;
-        this.background = new PIXI.Graphics(), this.background.beginFill(16777215), this.background.tint = 4533865, 
+        this.vecColors = [ 5736768, 14102692, 14582630, 2351054, 11029976, 2839847 ], this.backColor = 4533865, 
+        this.background = new PIXI.Graphics(), this.background.beginFill(this.backColor), 
         this.background.drawRect(0, 0, windowWidth, windowHeight), this.addChild(this.background), 
         this.hitTouch = new PIXI.Graphics(), this.hitTouch.interactive = !0, this.hitTouch.beginFill(0), 
         this.hitTouch.drawRect(0, 0, windowWidth, windowHeight), this.addChild(this.hitTouch), 
@@ -2138,6 +2153,7 @@ var Application = AbstractApplication.extend({
         this.loaderBar.getContent().alpha = 0, this.initLevel(), this.startLevel = !1;
     },
     miss: function() {
+        this.player.breakJump = !0, this.player.velocity.y = 0;
         var rot = .004 * Math.random(), tempLabel = new PIXI.Text("ERROU", {
             font: "50px Vagron",
             fill: "#ec8b78"
@@ -2145,7 +2161,7 @@ var Application = AbstractApplication.extend({
             x: 0,
             y: 0
         }, 120, tempLabel, rot);
-        errou.maxScale = this.player.getContent().scale.x, errou.build(), errou.gravity = .2, 
+        errou.maxScale = this.player.getContent().scale.x, errou.build(), errou.gravity = .1, 
         errou.alphadecress = .01, errou.scaledecress = .05, errou.setPosition(this.player.getPosition().x - tempLabel.width / 2, this.player.getPosition().y - 50), 
         this.layer.addChild(errou);
         var errou2 = new Particles({
@@ -2155,7 +2171,7 @@ var Application = AbstractApplication.extend({
             font: "50px Vagron",
             fill: "#d41819"
         }), -rot);
-        errou2.maxScale = this.player.getContent().scale.x, errou2.build(), errou2.gravity = .2, 
+        errou2.maxScale = this.player.getContent().scale.x, errou2.build(), errou2.gravity = .1, 
         errou2.alphadecress = .01, errou2.scaledecress = .05, errou2.setPosition(this.player.getPosition().x - tempLabel.width / 2 + 2, this.player.getPosition().y - 50 + 2), 
         this.layer.addChild(errou2), this.player.inError = !0, this.levelCounter -= .1 * this.levelCounterMax, 
         this.levelCounter < 0 && (this.levelCounter = 0);
@@ -2173,8 +2189,8 @@ var Application = AbstractApplication.extend({
         this.destroy(), this.build();
     },
     update: function() {
-        this.updateable && (this.player.inError || (this.tapDown && this.force < 30 && (this.force += .75), 
-        this.startLevel && (this.levelCounter--, this.levelCounter < 0 && (this.levelCounter = 0))), 
+        this.updateable && (this.player.inError || (this.tapDown && this.force < 30 && (this.force += .9, 
+        this.player.charge()), this.startLevel && (this.levelCounter--, this.levelCounter < 0 && (this.levelCounter = 0))), 
         this.player.force = this.force, this.levelCounter <= 0 && this.gameOver(), this.loaderBar.updateBar(this.levelCounter, this.levelCounterMax), 
         this._super());
     },
@@ -2206,17 +2222,18 @@ var Application = AbstractApplication.extend({
         this.earthquake(40);
     },
     getCoin: function() {
-        this.levelCounter += .1 * this.levelCounterMax, this.levelCounter > this.levelCounterMax && (this.levelCounter = this.levelCounterMax), 
+        this.levelCounter += .05 * this.levelCounterMax, this.levelCounter > this.levelCounterMax && (this.levelCounter = this.levelCounterMax), 
         this.targetJump.randomPos(.05 * windowHeight, .4 * windowHeight), this.updateCoins(), 
         this.targetJump.explode(), this.earthquake(20), this.changeColor();
     },
-    changeColor: function() {
-        var tempColor = this.background.tint;
-        this.background.tint = 16777215, tempColor = addHue(tempColor, 5 * (Math.random() - .5)), 
-        tempColor = setSaturation(tempColor, .2), tempColor = addHue(tempColor, .9), TweenLite.to(this.background, .3, {
-            tint: tempColor
-        }), tempColor = addBright(tempColor, .5), this.player.spriteBall.tint = tempColor, 
-        this.loaderBar.backBaseShape.tint = tempColor;
+    changeColor: function(force) {
+        var tempColor = 0, self = this, temptempColor = this.vecColors[Math.floor(this.vecColors.length * Math.random())];
+        force ? (self.background.clear(), self.background.beginFill(temptempColor), self.background.drawRect(-80, -80, windowWidth + 160, windowHeight + 160)) : TweenLite.to(this, .3, {
+            backColor: temptempColor,
+            onUpdate: function() {
+                self.background.clear(), self.background.beginFill(self.backColor), self.background.drawRect(-80, -80, windowWidth + 160, windowHeight + 160);
+            }
+        }), tempColor = addBright(temptempColor, .5), this.player.setColor(tempColor), this.loaderBar.setBackColor(tempColor);
     },
     earthquake: function(force) {
         var earth = new TimelineLite();
@@ -2233,7 +2250,8 @@ var Application = AbstractApplication.extend({
     },
     updateCoins: function() {
         this.coinsLabel.setText(APP.points), this.coinsLabel.position.x = windowWidth / 2 - this.coinsLabel.width / 2, 
-        this.coinsLabel.position.y = windowHeight / 2 - this.coinsLabel.height / 2, this.coinsLabel.parent.setChildIndex(this.coinsLabel, 1);
+        this.coinsLabel.position.y = windowHeight / 2 - this.coinsLabel.height / 2, this.background.parent.setChildIndex(this.background, 0), 
+        this.coinsLabel.parent.setChildIndex(this.coinsLabel, 1);
     },
     initLevel: function(whereInit) {
         this.player = new Ball({
@@ -2250,7 +2268,7 @@ var Application = AbstractApplication.extend({
         this.targetJump.getContent().position.y = .2 * windowHeight, TweenLite.to(this.tapToPlay, .5, {
             alpha: 1
         }), this.force = 0, this.levelCounter = 800, this.levelCounterMax = 800, APP.points = 0, 
-        this.updateCoins();
+        this.updateCoins(), this.changeColor(!0);
     },
     transitionIn: function() {
         this.build();
@@ -2524,7 +2542,7 @@ var Application = AbstractApplication.extend({
     },
     build: function() {
         this._super();
-        var assetsToLoader = [ "dist/img/atlas1.json", "dist/img/1.png", "dist/img/2.png", "dist/img/3.png", "dist/img/4.png", "dist/img/5.png", "dist/img/6.png" ];
+        var assetsToLoader = [ "dist/img/atlas1.json" ];
         assetsToLoader.length > 0 && !this.isLoaded ? (this.loader = new PIXI.AssetLoader(assetsToLoader), 
         this.initLoad()) : this.onAssetsLoaded();
     },

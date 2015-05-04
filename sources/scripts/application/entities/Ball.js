@@ -29,10 +29,11 @@ var Ball = Entity.extend({
 
 
 		// this.spriteBall = new PIXI.Sprite.fromFrame(this.imgSource);
+		this.color = 0xFFFFFF;
 		this.spriteBall = new PIXI.Graphics();
-		this.spriteBall.beginFill(0xFFFFFF);
+		this.spriteBall.beginFill(this.color);
 		this.maxSize = windowHeight * 0.05;
-		this.spriteBall.drawCircle(0,0,windowHeight * 0.05 - 30);
+		this.spriteBall.drawCircle(0,0,this.maxSize);
 
 		this.sprite = new PIXI.Sprite();
         this.sprite.addChild(this.spriteBall);
@@ -107,10 +108,10 @@ var Ball = Entity.extend({
 		this.range = this.spriteBall.height / 2;
 
 		// console.log(this.getContent().position.y , this.velocity.y , this.floorPos);
-		if(this.getContent().position.y + this.velocity.y >= this.floorPos - this.spriteBall.height / 2){
+		if(this.getContent().position.y + this.velocity.y >= this.floorPos - this.spriteBall.height / 2 + this.maxSize){
 			this.velocity.y = 0;
 			this.gravity = 0;
-			this.getContent().position.y = this.floorPos - this.spriteBall.height / 2;
+			this.getContent().position.y = this.floorPos - this.spriteBall.height / 2 + this.maxSize;
 			this.breakJump = false;
 			this.blockCollide = false;
 			this.inError = false;
@@ -160,7 +161,7 @@ var Ball = Entity.extend({
 
 
             var tempPart = new PIXI.Graphics();
-			tempPart.beginFill(this.spriteBall.tint);
+			tempPart.beginFill(this.color);
 			tempPart.drawCircle(0,0,this.spriteBall.width);
 
             //efeito 3
@@ -258,6 +259,12 @@ var Ball = Entity.extend({
 			}
 		}
 	},
+	setColor:function(color){
+		this.color = color;
+		this.spriteBall.clear();
+		this.spriteBall.beginFill(color);
+		this.spriteBall.drawCircle(0,0,this.maxSize);
+	},
 	charge:function(force){
 		var angle = degreesToRadians(Math.random() * 360);
 		// var angle = degreesToRadians(60);
@@ -270,12 +277,15 @@ var Ball = Entity.extend({
 		var vel = 2;
 		var vecVel = {x: Math.sin(vector) * vel, y: Math.cos(vector) * vel};
 
+		console.log('charge');
 		var tempPart = new PIXI.Graphics();
-		tempPart.beginFill(0xFFFFFF);
+		tempPart.beginFill(this.color);
 		tempPart.drawCircle(0,0,windowHeight * 0.05);
 		var particle = new Particles(vecVel, 800, tempPart, 0);
+
 		particle.initScale = this.getContent().scale.x / 10;
         particle.maxScale = this.getContent().scale.x / 3;
+
         // particle.maxInitScale = particle.maxScale / 1.5;
         // particle.growType = -1;
         particle.build();
