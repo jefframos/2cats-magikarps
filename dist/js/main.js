@@ -2531,7 +2531,7 @@ var Application = AbstractApplication.extend({
     initLoad: function() {
         var barHeight = 20;
         this.loaderContainer = new PIXI.DisplayObjectContainer(), this.addChild(this.loaderContainer), 
-        this.loaderBar = new LifeBarHUD(.6 * windowWidth, barHeight, 0, 16106252, 16729404), 
+        this.loaderBar = new LifeBarHUD(.6 * windowWidth, barHeight, 0, 10307552, 1295030), 
         this.loaderContainer.addChild(this.loaderBar.getContent()), this.loaderBar.getContent().position.x = windowWidth / 2 - this.loaderBar.getContent().width / 2, 
         this.loaderBar.getContent().position.y = windowHeight - this.loaderBar.getContent().height - .1 * windowHeight, 
         this.loaderBar.updateBar(0, 100), this._super();

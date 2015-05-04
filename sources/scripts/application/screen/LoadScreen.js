@@ -32,7 +32,7 @@ var LoadScreen = AbstractScreen.extend({
         this.loaderContainer = new PIXI.DisplayObjectContainer();
         this.addChild(this.loaderContainer);
 
-        this.loaderBar = new LifeBarHUD(windowWidth * 0.6, barHeight, 0, 0xf5c30c, 0xFF453c);
+        this.loaderBar = new LifeBarHUD(windowWidth * 0.6, barHeight, 0, 0x9d47e0, 0x13c2b6);
         this.loaderContainer.addChild(this.loaderBar.getContent());
         this.loaderBar.getContent().position.x = windowWidth / 2 - this.loaderBar.getContent().width / 2;
         this.loaderBar.getContent().position.y = windowHeight - this.loaderBar.getContent().height - windowHeight * 0.1;
