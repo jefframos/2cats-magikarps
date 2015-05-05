@@ -334,14 +334,16 @@ var Application = AbstractApplication.extend({
             self._super(windowWidth, windowHeight), self.stage.setBackgroundColor(self.backColor), 
             self.stage.removeChild(self.loadText), self.labelDebug = new PIXI.Text("", {
                 font: "15px Arial"
-            }), self.labelDebug.position.y = windowHeight - 20, self.labelDebug.position.x = 20, 
-            self.initialized = !0, self.withAPI = !1, "#withoutAPI" === window.location.hash && (self.withAPI = !1);
+            }), self.stage.addChild(self.labelDebug), self.labelDebug.position.y = windowHeight - 20, 
+            self.labelDebug.position.x = 20, self.initialized = !0, self.withAPI = !1, "#withoutAPI" === window.location.hash && (self.withAPI = !1);
         }
         var self = this;
-        this.vecColors = [ 13644274, 16733741, 10362600, 5960305 ], this.vecColorsS = [ "#D031F2", "#FF562D", "#9E1EE8", "#5AF271" ], 
-        this.vecPerfects = [ "PERFECT!", "AWESOME!", "AMAZING!", "GOD!!!" ], this.vecGood = [ "GOOD", "COOL", "YO", "NOT BAD" ], 
-        this.vecError = [ "NOOOO!", "BAD", "=(", "NOT" ], this.currentColorID = Math.floor(this.vecColors.length * Math.random()), 
-        this.backColor = this.vecColors[this.currentColorID], initialize();
+        this.vecColors = [ 16743382, 16735338, 16746088, 16563797, 5563861, 2783487, 9586937, 14111213 ], 
+        this.vecColorsS = [ "#FF7BD6", "#FF5C6A", "#FF8668", "#FCBE55", "#54E5D5", "#2A78FF", "#9248F9", "#D751ED" ], 
+        this.vecPerfects = [ "PERFECT!", "AWESOME!", "AMAZING!", "GOD!!!", "WOWOWOW", "YEAHAhah" ], 
+        this.vecGood = [ "GOOD", "COOL", "YEP", "NOT BAD" ], this.vecError = [ "NOOOO!", "BAD", "=(", "NOT", "AHHhh" ], 
+        this.currentColorID = Math.floor(this.vecColors.length * Math.random()), this.backColor = this.vecColors[this.currentColorID], 
+        initialize();
     },
     update: function() {
         this.initialized && (this._super(), this.withAPI && this.apiLogo && this.apiLogo.getContent().height > 1 && 0 === this.apiLogo.getContent().position.x && (scaleConverter(this.apiLogo.getContent().width, windowWidth, .5, this.apiLogo), 
@@ -981,6 +983,37 @@ var Application = AbstractApplication.extend({
     },
     preKill: function() {
         this.invencible || (this.explode(-2, 2), this.collidable = !1, this.kill = !0);
+    }
+}), CrazyLogo = Entity.extend({
+    init: function(screen) {
+        this._super(!0), this.screen = screen, this.container = new PIXI.DisplayObjectContainer(), 
+        this.title = "EPILEPSY", this.vecLetters = [], this.tempCounter = 0, this.colorsCounter = 3;
+    },
+    build: function() {
+        for (var i = 0; i < this.title.length; i++) console.log(this.title[i]), tempText = new PIXI.Text(this.title[i], {
+            align: "center",
+            font: "48px Vagron",
+            fill: APP.vecColorsS[this.tempCounter],
+            stroke: "#FFFFFF",
+            strokeThickness: 5
+        }), tempText.resolution = retina, tempText.position.x = 17 * i * tempText.resolution, 
+        this.container.addChild(tempText), this.vecLetters.push(tempText), this.tempCounter++, 
+        this.tempCounter >= APP.vecColorsS.length && (this.tempCounter = 0);
+    },
+    getContent: function() {
+        return this.container;
+    },
+    update: function() {
+        if (this.colorsCounter--, !(this.colorsCounter > 0)) {
+            this.colorsCounter = 3;
+            for (var i = 0; i < this.vecLetters.length; i++) this.vecLetters[i].setStyle({
+                align: "center",
+                font: "48px Vagron",
+                fill: APP.vecColorsS[this.tempCounter],
+                stroke: "#FFFFFF",
+                strokeThickness: 5
+            }), this.tempCounter = Math.floor(Math.random() * APP.vecColorsS.length), this.tempCounter >= APP.vecColorsS.length && (this.tempCounter = 0);
+        }
     }
 }), EnemyBall = Entity.extend({
     init: function(vel, behaviour) {
@@ -2127,7 +2160,8 @@ var Application = AbstractApplication.extend({
     }
 }), GameScreen = AbstractScreen.extend({
     init: function(label) {
-        this._super(label), this.isLoaded = !1, this.fistTime = !1;
+        this._super(label), this.isLoaded = !1, this.fistTime = !1, APP.points = 0, APP.cookieManager.getSafeCookie("highscore") ? APP.highscore = APP.cookieManager.getSafeCookie("highscore") : (APP.cookieManager.setSafeCookie("highscore", 0), 
+        APP.highscore = 0);
     },
     destroy: function() {
         this._super();
@@ -2292,41 +2326,89 @@ var Application = AbstractApplication.extend({
         }, 500);
     },
     openEndMenu: function() {
-        this.playAgainContainer = new PIXI.DisplayObjectContainer(), this.playAgainButton = new PIXI.Graphics(), 
-        this.playAgainButton.beginFill(16777215), this.playAgainButton.drawRect(0, 0, 100, 60), 
-        this.playAgainLabel = new PIXI.Text("PLAY", {
+        this.endMenuContainer = new PIXI.DisplayObjectContainer(), this.container.addChild(this.endMenuContainer), 
+        APP.points > APP.highscore && (APP.cookieManager.setSafeCookie("highscore", APP.points), 
+        APP.highscore = APP.points);
+        var scoreContainer = new PIXI.DisplayObjectContainer(), scoreBack = new PIXI.Graphics();
+        scoreBack.beginFill(16777215), scoreBack.drawRect(0, 0, 160, 120), scoreContainer.addChild(scoreBack);
+        var currentScoreTitle = new PIXI.Text("SCORE", {
+            align: "center",
+            font: "18px Vagron",
+            fill: APP.vecColorsS[APP.currentColorID],
+            wordWrap: !0,
+            wordWrapWidth: 100
+        });
+        scoreContainer.addChild(currentScoreTitle), currentScoreTitle.resolution = retina, 
+        currentScoreTitle.position.x = scoreBack.width / 2 - currentScoreTitle.width / 2 / currentScoreTitle.resolution, 
+        currentScoreTitle.position.y = 10;
+        var currentScore = new PIXI.Text(APP.points, {
             align: "center",
             font: "30px Vagron",
             fill: APP.vecColorsS[APP.currentColorID],
             wordWrap: !0,
             wordWrapWidth: 500
-        }), this.playAgainLabel.position.x = 15, this.playAgainLabel.position.y = 10, this.playAgainLabel.resolution = retina, 
-        this.playAgainContainer.addChild(this.playAgainButton), this.playAgainContainer.addChild(this.playAgainLabel), 
-        this.addChild(this.playAgainContainer), this.playAgainContainer.position.x = windowWidth / 2 - this.playAgainButton.width / 2, 
-        this.playAgainContainer.position.y = windowHeight / 2 - this.playAgainButton.height / 2, 
-        TweenLite.from(this.playAgainContainer, 5, {
-            x: 1.1 * windowWidth,
-            y: this.playAgainContainer.position.y - 50,
-            ease: "easeOutElastic"
-        }), TweenLite.to(this.interactiveBackground, 2, {
-            accel: 0
-        }), this.playAgainContainer.interactive = !0;
+        });
+        scoreContainer.addChild(currentScore), currentScore.resolution = retina, currentScore.position.x = scoreBack.width / 2 - currentScore.width / 2 / currentScore.resolution, 
+        currentScore.position.y = currentScoreTitle.position.y + currentScoreTitle.height / currentScoreTitle.resolution - 10;
+        var highscoreTitle = new PIXI.Text("HIGHSCORE", {
+            align: "center",
+            font: "14px Vagron",
+            fill: APP.vecColorsS[APP.currentColorID],
+            wordWrap: !0,
+            wordWrapWidth: 100
+        });
+        scoreContainer.addChild(highscoreTitle), highscoreTitle.resolution = retina, highscoreTitle.position.x = scoreBack.width / 2 - highscoreTitle.width / 2 / highscoreTitle.resolution, 
+        highscoreTitle.position.y = currentScore.position.y + currentScore.height / currentScore.resolution;
+        var highScoreLabel = new PIXI.Text(APP.highscore, {
+            align: "center",
+            font: "22px Vagron",
+            fill: APP.vecColorsS[APP.currentColorID],
+            wordWrap: !0,
+            wordWrapWidth: 500
+        });
+        scoreContainer.addChild(highScoreLabel), highScoreLabel.resolution = retina, highScoreLabel.position.x = scoreBack.width / 2 - highScoreLabel.width / 2 / highScoreLabel.resolution, 
+        highScoreLabel.position.y = highscoreTitle.position.y + highscoreTitle.height / highscoreTitle.resolution - 10, 
+        scoreContainer.position.x = windowWidth / 2 - scoreBack.width / 2, scoreContainer.position.y = windowHeight / 2 - scoreBack.height / 2, 
+        this.endMenuContainer.addChild(scoreContainer);
+        var playAgainContainer = new PIXI.DisplayObjectContainer(), playAgainButton = new PIXI.Graphics();
+        playAgainButton.beginFill(16777215), playAgainButton.drawRect(0, 0, 100, 60);
+        var playAgainLabel = new PIXI.Text("PLAY", {
+            align: "center",
+            font: "30px Vagron",
+            fill: APP.vecColorsS[APP.currentColorID],
+            wordWrap: !0,
+            wordWrapWidth: 500
+        });
+        playAgainLabel.position.x = 15, playAgainLabel.position.y = 10, playAgainLabel.resolution = retina, 
+        playAgainContainer.addChild(playAgainButton), playAgainContainer.addChild(playAgainLabel), 
+        this.endMenuContainer.addChild(playAgainContainer), playAgainContainer.position.x = windowWidth / 2 - playAgainButton.width / 2, 
+        playAgainContainer.position.y = .9 * windowHeight - playAgainContainer.height, playAgainContainer.interactive = !0;
         var self = this;
-        this.playAgainContainer.touchstart = this.playAgainContainer.mousedown = function(mouseData) {
-            TweenLite.to(self.playAgainContainer, 1, {
+        playAgainContainer.touchstart = playAgainContainer.mousedown = function(mouseData) {
+            TweenLite.to(self.endMenuContainer, 1, {
                 x: windowWidth,
-                y: windowHeight / 2 - self.playAgainButton.height / 2 - 50,
+                y: -50,
                 ease: "easeOutCubic",
                 onComplete: function() {
                     self.reset();
                 }
-            }), self.interactiveBackground.accel = 5, self.interactiveBackground.gravity = -5, 
-            TweenLite.to(self.interactiveBackground, 2, {
+            }), self.interactiveBackground.accel = 5, TweenLite.to(self.interactiveBackground, 2, {
                 accel: 0
-            }), TweenLite.to(self.interactiveBackground, 2, {
-                gravity: 0
             });
         };
+        var crazyLogo = new CrazyLogo(this);
+        crazyLogo.build(), this.endMenuContainer.addChild(crazyLogo.getContent()), crazyLogo.getContent().position.x = windowWidth / 2 - crazyLogo.getContent().width / 2 + 12, 
+        crazyLogo.getContent().position.y = .2 * windowHeight, TweenLite.from(crazyLogo.getContent(), 4.5, {
+            x: 1.1 * windowWidth,
+            y: crazyLogo.getContent().position.y - 50,
+            ease: "easeOutElastic"
+        }), TweenLite.from(this.endMenuContainer, 5, {
+            x: 1.1 * windowWidth,
+            y: this.endMenuContainer.position.y - 50,
+            ease: "easeOutElastic"
+        }), TweenLite.to(this.interactiveBackground, 2, {
+            accel: 0
+        });
     },
     addRegularLabel: function(label, font) {
         var rot = .004 * Math.random(), tempLabel = new PIXI.Text(label, {
@@ -2352,10 +2434,10 @@ var Application = AbstractApplication.extend({
     },
     getPerfect: function() {
         this.addRegularLabel(APP.vecPerfects[Math.floor(APP.vecPerfects.length * Math.random())], "50px Vagron"), 
-        this.earthquake(40), this.levelCounter += .08 * this.levelCounterMax, this.levelCounter > this.levelCounterMax && (this.levelCounter = this.levelCounterMax);
+        this.earthquake(40), this.levelCounter += .05 * this.levelCounterMax, this.levelCounter > this.levelCounterMax && (this.levelCounter = this.levelCounterMax);
     },
     getCoin: function(isPerfect) {
-        this.levelCounter += .04 * this.levelCounterMax, this.levelCounter > this.levelCounterMax && (this.levelCounter = this.levelCounterMax), 
+        this.levelCounter += .015 * this.levelCounterMax, this.levelCounter > this.levelCounterMax && (this.levelCounter = this.levelCounterMax), 
         this.targetJump.randomPos(.05 * windowHeight, .4 * windowHeight), this.updateCoins(), 
         this.targetJump.explode(), isPerfect || this.addRegularLabel(APP.vecGood[Math.floor(APP.vecGood.length * Math.random())], "30px Vagron"), 
         this.earthquake(20), this.changeColor();

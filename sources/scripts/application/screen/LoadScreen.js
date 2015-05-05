@@ -3,6 +3,7 @@ var LoadScreen = AbstractScreen.extend({
     init: function (label) {
         this._super(label);
         this.isLoaded = false;
+        
         // alert(this.isLoaded);
     },
     destroy: function () {

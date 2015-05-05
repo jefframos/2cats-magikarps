@@ -3,11 +3,15 @@ var Application = AbstractApplication.extend({
 	init:function(){
         var self = this;
 
-        this.vecColors = [0xD031F2,0xFF562D,0x9E1EE8,0x5AF271];
-        this.vecColorsS = ['#D031F2','#FF562D','#9E1EE8','#5AF271'];
-        this.vecPerfects = ['PERFECT!', 'AWESOME!', 'AMAZING!', 'GOD!!!'];
-        this.vecGood = ['GOOD', 'COOL', 'YO', 'NOT BAD'];
-        this.vecError = ['NOOOO!', 'BAD', '=(', 'NOT'];
+        //GUMBALL
+        // this.vecColors = [0x219A33,0xD61767,0x63C2C8,0x5AF271,0xB24191,0xFFE40E,0xE84E0E,0x5C79BB];
+        // this.vecColorsS = ['#219A33','#D61767','#63C2C8','#5AF271','#B24191','#FFE40E','#E84E0E','#5C79BB'];
+
+        this.vecColors = [0xFF7BD6,0xFF5C6A,0xFF8668,0xFCBE55,0x54E5D5,0x2A78FF,0x9248F9,0xD751ED];
+        this.vecColorsS = ['#FF7BD6','#FF5C6A','#FF8668','#FCBE55','#54E5D5','#2A78FF','#9248F9','#D751ED'];
+        this.vecPerfects = ['PERFECT!', 'AWESOME!', 'AMAZING!', 'GOD!!!', 'WOWOWOW', 'YEAHAhah'];
+        this.vecGood = ['GOOD', 'COOL', 'YEP', 'NOT BAD'];
+        this.vecError = ['NOOOO!', 'BAD', '=(', 'NOT', 'AHHhh'];
         this.currentColorID = Math.floor(this.vecColors.length * Math.random());
 
         this.backColor = this.vecColors[this.currentColorID];
@@ -18,7 +22,7 @@ var Application = AbstractApplication.extend({
             self.stage.removeChild(self.loadText);
 
             self.labelDebug = new PIXI.Text('', {font:'15px Arial'});
-            // self.stage.addChild(self.labelDebug);
+            self.stage.addChild(self.labelDebug);
             self.labelDebug.position.y = windowHeight - 20;
             self.labelDebug.position.x = 20;
 

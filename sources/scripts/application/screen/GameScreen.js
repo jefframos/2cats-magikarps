@@ -4,6 +4,13 @@ var GameScreen = AbstractScreen.extend({
 		this._super(label);
 		this.isLoaded = false;
 		this.fistTime = false;
+		APP.points = 0;
+		if(APP.cookieManager.getSafeCookie('highscore')){
+			APP.highscore = APP.cookieManager.getSafeCookie('highscore');
+		}else{
+			APP.cookieManager.setSafeCookie('highscore', 0);
+			APP.highscore = 0;
+		}
 
 		// APP.vecColors = [0xD031F2,0xFF562D,0x9E1EE8,0x5AF271];
   //       APP.vecColorsS = ['#D031F2','#FF562D','#9E1EE8','#5AF271'];
@@ -342,37 +349,105 @@ var GameScreen = AbstractScreen.extend({
 	},
 	openEndMenu:function(){
 
-		this.playAgainContainer = new PIXI.DisplayObjectContainer();
-		this.playAgainButton = new PIXI.Graphics();
-		this.playAgainButton.beginFill(0xFFFFFF);
-		this.playAgainButton.drawRect(0,0,100, 60);
-		this.playAgainLabel = new PIXI.Text('PLAY', {align:'center',font:'30px Vagron', fill:APP.vecColorsS[APP.currentColorID], wordWrap:true, wordWrapWidth:500});
-		this.playAgainLabel.position.x = 15;
-		this.playAgainLabel.position.y = 10;
-		this.playAgainLabel.resolution = retina;
-		this.playAgainContainer.addChild(this.playAgainButton);
-		this.playAgainContainer.addChild(this.playAgainLabel);
 
-		this.addChild(this.playAgainContainer);
-		this.playAgainContainer.position.x = windowWidth / 2 - this.playAgainButton.width / 2;
-		this.playAgainContainer.position.y = windowHeight / 2 - this.playAgainButton.height / 2;
+		this.endMenuContainer = new PIXI.DisplayObjectContainer();
+		this.container.addChild(this.endMenuContainer);
 
-		TweenLite.from(this.playAgainContainer, 5, {x: windowWidth * 1.1, y:this.playAgainContainer.position.y - 50, ease:'easeOutElastic'});
-		TweenLite.to(this.interactiveBackground, 2, {accel:0});
+		if(APP.points > APP.highscore){
+			APP.cookieManager.setSafeCookie('highscore', APP.points);
+			APP.highscore = APP.points;
+		}
+		// if(APP.points)
+		var scoreContainer = new PIXI.DisplayObjectContainer();
+		var scoreBack = new PIXI.Graphics();
+		scoreBack.beginFill(0xFFFFFF);
+		scoreBack.drawRect(0,0,160, 120);
+		scoreContainer.addChild(scoreBack);
 
-		this.playAgainContainer.interactive = true;
+
+		var currentScoreTitle = new PIXI.Text('SCORE', {align:'center',font:'18px Vagron', fill:APP.vecColorsS[APP.currentColorID], wordWrap:true, wordWrapWidth:100});
+		scoreContainer.addChild(currentScoreTitle);
+		currentScoreTitle.resolution = retina;
+
+		currentScoreTitle.position.x = scoreBack.width / 2 - currentScoreTitle.width / 2 / currentScoreTitle.resolution;
+		currentScoreTitle.position.y = 10;
+
+
+		var currentScore = new PIXI.Text(APP.points, {align:'center',font:'30px Vagron', fill:APP.vecColorsS[APP.currentColorID], wordWrap:true, wordWrapWidth:500});
+		scoreContainer.addChild(currentScore);
+		currentScore.resolution = retina;
+
+		currentScore.position.x = scoreBack.width / 2 - currentScore.width / 2 / currentScore.resolution;
+		currentScore.position.y = (currentScoreTitle.position.y + currentScoreTitle.height/ currentScoreTitle.resolution)  - 10;
+
+
+		var highscoreTitle = new PIXI.Text('HIGHSCORE', {align:'center',font:'14px Vagron', fill:APP.vecColorsS[APP.currentColorID], wordWrap:true, wordWrapWidth:100});
+		scoreContainer.addChild(highscoreTitle);
+		highscoreTitle.resolution = retina;
+
+		highscoreTitle.position.x = scoreBack.width / 2 - highscoreTitle.width / 2 / highscoreTitle.resolution;
+		highscoreTitle.position.y = currentScore.position.y + currentScore.height / currentScore.resolution;
+
+
+		var highScoreLabel = new PIXI.Text(APP.highscore, {align:'center',font:'22px Vagron', fill:APP.vecColorsS[APP.currentColorID], wordWrap:true, wordWrapWidth:500});
+		scoreContainer.addChild(highScoreLabel);
+		highScoreLabel.resolution = retina;
+
+
+		highScoreLabel.position.x = scoreBack.width / 2 - highScoreLabel.width / 2 / highScoreLabel.resolution;
+		highScoreLabel.position.y = (highscoreTitle.position.y + highscoreTitle.height / highscoreTitle.resolution) - 10;
+
+
+		scoreContainer.position.x = windowWidth / 2 - scoreBack.width / 2;
+		scoreContainer.position.y = windowHeight/2 - scoreBack.height / 2;
+		this.endMenuContainer.addChild(scoreContainer);
+
+
+		var playAgainContainer = new PIXI.DisplayObjectContainer();
+		var playAgainButton = new PIXI.Graphics();
+		playAgainButton.beginFill(0xFFFFFF);
+		playAgainButton.drawRect(0,0,100, 60);
+		var playAgainLabel = new PIXI.Text('PLAY', {align:'center',font:'30px Vagron', fill:APP.vecColorsS[APP.currentColorID], wordWrap:true, wordWrapWidth:500});
+		playAgainLabel.position.x = 15;
+		playAgainLabel.position.y = 10;
+		playAgainLabel.resolution = retina;
+		playAgainContainer.addChild(playAgainButton);
+		playAgainContainer.addChild(playAgainLabel);
+
+		this.endMenuContainer.addChild(playAgainContainer);
+		playAgainContainer.position.x = windowWidth / 2 - playAgainButton.width / 2;
+		playAgainContainer.position.y = windowHeight * 0.9 - playAgainContainer.height;
+
+		// playAgainContainer = new PIXI.DisplayObjectContainer();
+
+		playAgainContainer.interactive = true;
 
 		var self = this;
-		// this.playAgainContainer.touchend = this.playAgainContainer.mouseup = function(mouseData){
-		this.playAgainContainer.touchstart = this.playAgainContainer.mousedown = function(mouseData){
-			TweenLite.to(self.playAgainContainer, 1, {x: windowWidth, y:windowHeight / 2 - self.playAgainButton.height / 2 - 50, ease:'easeOutCubic', onComplete:function(){
+		// playAgainContainer.touchend = playAgainContainer.mouseup = function(mouseData){
+		playAgainContainer.touchstart = playAgainContainer.mousedown = function(mouseData){
+			TweenLite.to(self.endMenuContainer, 1, {x: windowWidth, y: - 50, ease:'easeOutCubic', onComplete:function(){
 				self.reset();
 			}});
+
+			// TweenLite.to(self.crazyLogo.getContent(), 1, {x: windowWidth, y: windowHeight * 0.2 - 50, ease:'easeOutCubic', onComplete:function(){
+			// 	// self.reset();
+			// }});
+
 			self.interactiveBackground.accel = 5;
-			self.interactiveBackground.gravity = -5;
+			// self.interactiveBackground.gravity = -5;
 			TweenLite.to(self.interactiveBackground, 2, {accel:0});
-			TweenLite.to(self.interactiveBackground, 2, {gravity:0});
+			// TweenLite.to(self.interactiveBackground, 2, {gravity:0});
 		};
+
+		var crazyLogo = new CrazyLogo(this);
+		crazyLogo.build();
+		this.endMenuContainer.addChild(crazyLogo.getContent());
+		crazyLogo.getContent().position.x = windowWidth / 2 - crazyLogo.getContent().width / 2 + 12;
+		crazyLogo.getContent().position.y = windowHeight * 0.2;
+		TweenLite.from(crazyLogo.getContent(), 4.5, {x: windowWidth * 1.1, y:crazyLogo.getContent().position.y - 50, ease:'easeOutElastic'});
+
+		TweenLite.from(this.endMenuContainer, 5, {x: windowWidth * 1.1, y:this.endMenuContainer.position.y - 50, ease:'easeOutElastic'});
+		TweenLite.to(this.interactiveBackground, 2, {accel:0});
 	},
 	addRegularLabel:function(label, font){
 		var rot = Math.random() * 0.004;
@@ -406,13 +481,13 @@ var GameScreen = AbstractScreen.extend({
 	getPerfect:function(){
 		this.addRegularLabel(APP.vecPerfects[Math.floor(APP.vecPerfects.length * Math.random())], '50px Vagron');
 		this.earthquake(40);
-		this.levelCounter += this.levelCounterMax * 0.08;
+		this.levelCounter += this.levelCounterMax * 0.05;
 		if(this.levelCounter > this.levelCounterMax){
 			this.levelCounter = this.levelCounterMax;
 		}
 	},
 	getCoin:function(isPerfect){
-		this.levelCounter += this.levelCounterMax * 0.04;
+		this.levelCounter += this.levelCounterMax * 0.015;
 		if(this.levelCounter > this.levelCounterMax){
 			this.levelCounter = this.levelCounterMax;
 		}
