@@ -37,7 +37,7 @@ var init = false;
 var renderer;
 var APP;
 
-var retina = 1;//window.devicePixelRatio >= 2 ? 2 : 1;
+var retina = window.devicePixelRatio >= 2 ? 2 : 1;
 
 function isPortait(){
 	return window.innerHeight > window.innerWidth;

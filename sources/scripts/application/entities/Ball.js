@@ -96,7 +96,7 @@ var Ball = Entity.extend({
 		this.firstJump = true;
 	},
 	improveGravity: function(){
-		if(this.gravityVal >= 1.5){
+		if(this.gravityVal >= 1.2){
 			return;
 		}
 		

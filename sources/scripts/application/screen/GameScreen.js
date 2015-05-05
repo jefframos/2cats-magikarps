@@ -77,7 +77,7 @@ var GameScreen = AbstractScreen.extend({
 
 		this.hitTouch.touchend = this.hitTouch.mouseup = function(mouseData){
 			self.tapDown = false;
-			self.shoot(self.force);
+			self.shoot(self.force * gameScale);
 		};
 
 		this.hitTouch.touchstart = this.hitTouch.mousedown = function(touchData){
@@ -153,6 +153,7 @@ var GameScreen = AbstractScreen.extend({
 
 		this.coinsLabel = new PIXI.Text('0', {align:'center',font:'72px Vagron', fill:'#FFFFFF', wordWrap:true, wordWrapWidth:500});
 		// scaleConverter(this.coinsLabel.height, windowHeight, 0.2, this.coinsLabel);
+		this.coinsLabel.resolution = retina;
 		this.coinsLabel.alpha = 0;
 		this.addChild(this.coinsLabel);
 
@@ -194,15 +195,17 @@ var GameScreen = AbstractScreen.extend({
 		var scl = 1;
 		this.crazyLabel = new PIXI.Text(message, {align:'center',font:'30px Vagron', fill:'#9d47e0', wordWrap:true, wordWrapWidth:500});
 		// scl = scaleConverter(this.crazyLabel.height, windowHeight, 0.06, this.crazyLabel);
+		this.crazyLabel.resolution = retina;
 		this.crazyLabel.rotation = rot;
-		this.crazyLabel.position.y = windowHeight / 1.1 + this.crazyLabel.height / 2;
+		this.crazyLabel.position.y = windowHeight / 1.1 + this.crazyLabel.height / 2 / this.crazyLabel.resolution;
 		this.crazyLabel.position.x = windowWidth / 2;
 		this.crazyLabel.anchor = {x:0.5, y:0.5};
 
 		this.crazyLabel2 = new PIXI.Text(message, {align:'center',font:'30px Vagron', fill:'#13c2b6', wordWrap:true, wordWrapWidth:500});
+		this.crazyLabel2.resolution = retina;
 		// scaleConverter(this.crazyLabel2.height, windowHeight, 0.06, this.crazyLabel2);
 		this.crazyLabel2.rotation = -rot;
-		this.crazyLabel2.position.y = windowHeight / 1.1 + this.crazyLabel2.height / 2;
+		this.crazyLabel2.position.y = windowHeight / 1.1 + this.crazyLabel2.height / 2 / this.crazyLabel2.resolution;
 		this.crazyLabel2.position.x = windowWidth / 2;
 		this.crazyLabel2.anchor = {x:0.5, y:0.5};
 
@@ -346,12 +349,13 @@ var GameScreen = AbstractScreen.extend({
 		this.playAgainLabel = new PIXI.Text('PLAY', {align:'center',font:'30px Vagron', fill:this.vecColorsS[this.currentColorID], wordWrap:true, wordWrapWidth:500});
 		this.playAgainLabel.position.x = 15;
 		this.playAgainLabel.position.y = 10;
+		this.playAgainLabel.resolution = retina;
 		this.playAgainContainer.addChild(this.playAgainButton);
 		this.playAgainContainer.addChild(this.playAgainLabel);
 
 		this.addChild(this.playAgainContainer);
-		this.playAgainContainer.position.x = windowWidth / 2 - this.playAgainContainer.width / 2;
-		this.playAgainContainer.position.y = windowHeight / 2 - this.playAgainContainer.height / 2;
+		this.playAgainContainer.position.x = windowWidth / 2 - this.playAgainButton.width / 2;
+		this.playAgainContainer.position.y = windowHeight / 2 - this.playAgainButton.height / 2;
 
 		TweenLite.from(this.playAgainContainer, 5, {x: windowWidth * 1.1, y:this.playAgainContainer.position.y - 50, ease:'easeOutElastic'});
 		TweenLite.to(this.interactiveBackground, 2, {accel:0});
@@ -361,7 +365,7 @@ var GameScreen = AbstractScreen.extend({
 		var self = this;
 		// this.playAgainContainer.touchend = this.playAgainContainer.mouseup = function(mouseData){
 		this.playAgainContainer.touchstart = this.playAgainContainer.mousedown = function(mouseData){
-			TweenLite.to(self.playAgainContainer, 1.5, {x: windowWidth * 1.1, y:windowHeight / 2 - self.playAgainContainer.height / 2 - 50, ease:'easeOutCubic', onComplete:function(){
+			TweenLite.to(self.playAgainContainer, 1.5, {x: windowWidth * 1.1, y:windowHeight / 2 - self.playAgainButton.height / 2 - 50, ease:'easeOutCubic', onComplete:function(){
 				self.reset();
 			}});
 			self.interactiveBackground.accel = 5;
@@ -458,8 +462,8 @@ var GameScreen = AbstractScreen.extend({
 	updateCoins:function(){
 		this.coinsLabel.setText(APP.points);
 		TweenLite.to(this.coinsLabel, 0.5, {delay:1, alpha:0.5});
-		this.coinsLabel.position.x = windowWidth / 2 - this.coinsLabel.width / 2;
-		this.coinsLabel.position.y = windowHeight / 2 - this.coinsLabel.height / 2;
+		this.coinsLabel.position.x = windowWidth / 2 - this.coinsLabel.width / 2 / this.coinsLabel.resolution;
+		this.coinsLabel.position.y = windowHeight / 2 - this.coinsLabel.height / 2 / this.coinsLabel.resolution;
 		if(this.background.parent){
 			this.background.parent.setChildIndex(this.background, 0);
 		}
@@ -470,13 +474,14 @@ var GameScreen = AbstractScreen.extend({
 		}
 		var tempCoins = new PIXI.Text(APP.points, {align:'center',font:'72px Vagron', fill:'#FFFFFF', wordWrap:true, wordWrapWidth:500});
 		tempCoins.anchor = {x:0.5, y:0.5};
+		tempCoins.resolution = retina;
 		var particle = new Particles({x: 0, y:0}, 120, tempCoins,0);
 		particle.maxScale = 5;
 		particle.maxInitScale = 1;
 		particle.build();
 		particle.alphadecress = 0.02;
 		particle.scaledecress = +0.02;
-		particle.setPosition(this.coinsLabel.position.x + tempCoins.width / 2, this.coinsLabel.position.y + tempCoins.height / 2);
+		particle.setPosition(this.coinsLabel.position.x + tempCoins.width / 2 / tempCoins.resolution, this.coinsLabel.position.y + tempCoins.height / 2 / tempCoins.resolution);
 		this.layer.addChild(particle);
 
 	},

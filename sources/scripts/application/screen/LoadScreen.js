@@ -33,6 +33,7 @@ var LoadScreen = AbstractScreen.extend({
         this._super();
 
         var text = new PIXI.Text('PLAY', {font:'50px Vagron', fill:'#FFFFFF'});
+       
         this.addChild(text);
         text.alpha = 0;
         //gambiarra pra forçar a fonte
