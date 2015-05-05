@@ -327,7 +327,7 @@ var Ball = Entity.extend({
 			tempParticle.drawCircle(0,0,this.spriteBall.width * 0.2);
 			// this.spriteBall.drawCircle(0,0,windowHeight * 0.02);
 
-			particle = new Particles({x: Math.random() * 10 - 5, y:Math.random() * 10 - 5}, 600, tempParticle, Math.random() * 0.05);
+			particle = new Particles({x: Math.random() * 10 - 5 - 10, y:Math.random() * 10 - 5 + 10}, 600, tempParticle, Math.random() * 0.05);
 			// particle.maxScale = this.getContent().scale.x / 2;
             // particle.maxInitScale = particle.maxScale;
 			particle.build();

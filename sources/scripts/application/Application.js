@@ -3,10 +3,18 @@ var Application = AbstractApplication.extend({
 	init:function(){
         var self = this;
 
+        this.vecColors = [0xD031F2,0xFF562D,0x9E1EE8,0x5AF271];
+        this.vecColorsS = ['#D031F2','#FF562D','#9E1EE8','#5AF271'];
+        this.vecPerfects = ['PERFECT!', 'AWESOME!', 'AMAZING!', 'GOD!!!'];
+        this.vecGood = ['GOOD', 'COOL', 'YO', 'NOT BAD'];
+        this.vecError = ['NOOOO!', 'BAD', '=(', 'NOT'];
+        this.currentColorID = Math.floor(this.vecColors.length * Math.random());
+
+        this.backColor = this.vecColors[this.currentColorID];
 
         function initialize(){
             self._super(windowWidth, windowHeight);
-            self.stage.setBackgroundColor(0x452E69);
+            self.stage.setBackgroundColor(self.backColor);
             self.stage.removeChild(self.loadText);
 
             self.labelDebug = new PIXI.Text('', {font:'15px Arial'});

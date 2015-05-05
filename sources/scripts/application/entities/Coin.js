@@ -68,7 +68,7 @@ var Coin = Entity.extend({
 	},
 	changeShape:function(){
 	},
-	explode:function(){
+	explode:function(velX, velY){
 		
 		var particle = null;
 		var tempParticle = null;
@@ -81,7 +81,7 @@ var Coin = Entity.extend({
 			tempParticle.drawRect(-this.size/2,-this.size/2,this.size,this.size);
 			// this.spriteBall.drawCircle(0,0,windowHeight * 0.02);
 
-			particle = new Particles({x: Math.random() * 10 - 5, y:Math.random() * 10 - 5}, 600, tempParticle, Math.random() * 0.05);
+			particle = new Particles({x: Math.random() * 10 - 5 + (velX?velX:0), y:Math.random() * 10 - 5 + (velY?velY:0)}, 600, tempParticle, Math.random() * 0.05);
 			// particle.maxScale = this.getContent().scale.x / 2;
             // particle.maxInitScale = particle.maxScale;
 			particle.build();
@@ -183,7 +183,7 @@ var Coin = Entity.extend({
   //               this.getPosition().y - (Math.random() + this.getContent().width * 0.4)+ this.getContent().width * 0.2);
 		// 	this.layer.addChild(particle);
 		// }
-		this.explode();
+		this.explode(-2, 2);
 		this.collidable = false;
 		this.kill = true;
 	},

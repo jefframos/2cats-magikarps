@@ -168,11 +168,16 @@ function fullscreen(){
 	isfull = true;
 }
 
+// alert(window.intel);
+
+// window.intel = true;
+
 (function() {
 	var App = {
 		init: function () {
 			if(window.intel !== undefined){
 				document.addEventListener('deviceready', function() {
+					alert('device ready');
 					initialize();
 				});
 			}else{

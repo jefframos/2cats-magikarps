@@ -5,14 +5,14 @@ var GameScreen = AbstractScreen.extend({
 		this.isLoaded = false;
 		this.fistTime = false;
 
-		this.vecColors = [0xD031F2,0xFF562D,0x9E1EE8,0x5AF271];
-		this.vecColorsS = ['#D031F2','#FF562D','#9E1EE8','#5AF271'];
-		this.vecPerfects = ['PERFECT!', 'AWESOME!', 'AMAZING!', 'GOD!!!'];
-		this.vecGood = ['GOOD', 'COOL', 'YO', 'NOT BAD'];
-		this.vecError = ['NOOOO!', 'BAD', '=(', 'NOT'];
-		this.currentColorID = Math.floor(this.vecColors.length * Math.random());
+		// APP.vecColors = [0xD031F2,0xFF562D,0x9E1EE8,0x5AF271];
+  //       APP.vecColorsS = ['#D031F2','#FF562D','#9E1EE8','#5AF271'];
+  //       APP.vecPerfects = ['PERFECT!', 'AWESOME!', 'AMAZING!', 'GOD!!!'];
+  //       APP.vecGood = ['GOOD', 'COOL', 'YO', 'NOT BAD'];
+  //       APP.vecError = ['NOOOO!', 'BAD', '=(', 'NOT'];
+  //       APP.currentColorID = Math.floor(APP.vecColors.length * Math.random());
 
-		this.backColor = this.vecColors[this.currentColorID];
+  //       APP.backColor = APP.vecColors[APP.currentColorID];
 
 	},
 	destroy: function () {
@@ -45,7 +45,7 @@ var GameScreen = AbstractScreen.extend({
 
 		if(!this.background){
 			this.background = new PIXI.Graphics();
-			this.background.beginFill(this.backColor);
+			this.background.beginFill(APP.backColor);
 			this.background.drawRect(0,0,windowWidth, windowHeight);
 			this.addChild(this.background);
 		}else{
@@ -130,7 +130,7 @@ var GameScreen = AbstractScreen.extend({
 
 
 		this.brilhoBase = new SimpleSprite('baseDegrade.png');
-		this.container.addChild(this.brilhoBase.getContent());
+		// this.container.addChild(this.brilhoBase.getContent());
 		this.brilhoBase.getContent().alpha = 0.5;
 		scaleConverter(this.brilhoBase.getContent().width, windowWidth, 1, this.brilhoBase);
 		this.brilhoBase.getContent().position.x = windowWidth / 2 - this.brilhoBase.getContent().width / 2;
@@ -227,9 +227,9 @@ var GameScreen = AbstractScreen.extend({
 
 		this.player.breakJump = true;
 		this.player.velocity.y = 0;
-		var wrongLabel = this.vecError[Math.floor(this.vecError.length * Math.random())];
+		var wrongLabel = APP.vecError[Math.floor(APP.vecError.length * Math.random())];
 		var rot = Math.random() * 0.004;
-		var tempLabel = new PIXI.Text(wrongLabel, {font:'30px Vagron', fill:'#ec8b78'});
+		var tempLabel = new PIXI.Text(wrongLabel, {font:'35px Vagron', fill:'#ec8b78'});
 
 		var errou = new Particles({x: 0, y:0}, 120, tempLabel,rot);
 		errou.maxScale = this.player.getContent().scale.x;
@@ -241,7 +241,7 @@ var GameScreen = AbstractScreen.extend({
 		errou.setPosition(this.player.getPosition().x - tempLabel.width / 2, this.player.getPosition().y - 50);
 		this.layer.addChild(errou);
 
-		var errou2 = new Particles({x: 0, y:0}, 120, new PIXI.Text(wrongLabel, {font:'30px Vagron', fill:'#c01f2e'}),-rot);
+		var errou2 = new Particles({x: 0, y:0}, 120, new PIXI.Text(wrongLabel, {font:'35px Vagron', fill:'#c01f2e'}),-rot);
 		errou2.maxScale = this.player.getContent().scale.x;
 		errou2.build();
 		// errou2.getContent().tint = 0xf5c30c;
@@ -346,7 +346,7 @@ var GameScreen = AbstractScreen.extend({
 		this.playAgainButton = new PIXI.Graphics();
 		this.playAgainButton.beginFill(0xFFFFFF);
 		this.playAgainButton.drawRect(0,0,100, 60);
-		this.playAgainLabel = new PIXI.Text('PLAY', {align:'center',font:'30px Vagron', fill:this.vecColorsS[this.currentColorID], wordWrap:true, wordWrapWidth:500});
+		this.playAgainLabel = new PIXI.Text('PLAY', {align:'center',font:'30px Vagron', fill:APP.vecColorsS[APP.currentColorID], wordWrap:true, wordWrapWidth:500});
 		this.playAgainLabel.position.x = 15;
 		this.playAgainLabel.position.y = 10;
 		this.playAgainLabel.resolution = retina;
@@ -365,11 +365,13 @@ var GameScreen = AbstractScreen.extend({
 		var self = this;
 		// this.playAgainContainer.touchend = this.playAgainContainer.mouseup = function(mouseData){
 		this.playAgainContainer.touchstart = this.playAgainContainer.mousedown = function(mouseData){
-			TweenLite.to(self.playAgainContainer, 1.5, {x: windowWidth * 1.1, y:windowHeight / 2 - self.playAgainButton.height / 2 - 50, ease:'easeOutCubic', onComplete:function(){
+			TweenLite.to(self.playAgainContainer, 1, {x: windowWidth, y:windowHeight / 2 - self.playAgainButton.height / 2 - 50, ease:'easeOutCubic', onComplete:function(){
 				self.reset();
 			}});
 			self.interactiveBackground.accel = 5;
+			self.interactiveBackground.gravity = -5;
 			TweenLite.to(self.interactiveBackground, 2, {accel:0});
+			TweenLite.to(self.interactiveBackground, 2, {gravity:0});
 		};
 	},
 	addRegularLabel:function(label, font){
@@ -402,9 +404,9 @@ var GameScreen = AbstractScreen.extend({
 		// }
 	},
 	getPerfect:function(){
-		this.addRegularLabel(this.vecPerfects[Math.floor(this.vecPerfects.length * Math.random())], '50px Vagron');
+		this.addRegularLabel(APP.vecPerfects[Math.floor(APP.vecPerfects.length * Math.random())], '50px Vagron');
 		this.earthquake(40);
-		this.levelCounter += this.levelCounterMax * 0.1;
+		this.levelCounter += this.levelCounterMax * 0.08;
 		if(this.levelCounter > this.levelCounterMax){
 			this.levelCounter = this.levelCounterMax;
 		}
@@ -419,7 +421,7 @@ var GameScreen = AbstractScreen.extend({
 		this.targetJump.explode();
 
 		if(!isPerfect){
-			this.addRegularLabel(this.vecGood[Math.floor(this.vecGood.length * Math.random())], '30px Vagron');
+			this.addRegularLabel(APP.vecGood[Math.floor(APP.vecGood.length * Math.random())], '30px Vagron');
 		}
 
 		this.earthquake(20);
@@ -430,17 +432,18 @@ var GameScreen = AbstractScreen.extend({
 		var self = this;
 		if(!first){
 			console.log('randomHEre');
-			this.currentColorID = Math.floor(this.vecColors.length * Math.random());
+			APP.currentColorID = Math.floor(APP.vecColors.length * Math.random());
 		}
-		var temptempColor = this.vecColors[this.currentColorID];
+		var temptempColor = APP.vecColors[APP.currentColorID];
+		console.log(temptempColor);
 		if(force){
 			self.background.clear();
 			self.background.beginFill(temptempColor);
 			self.background.drawRect(-80,-80,windowWidth + 160, windowHeight + 160);
 		}else{
-			TweenLite.to(this, 0.3, {backColor:temptempColor, onUpdate:function(){
+			TweenLite.to(APP, 0.3, {backColor:temptempColor, onUpdate:function(){
 				self.background.clear();
-				self.background.beginFill(self.backColor);
+				self.background.beginFill(APP.backColor);
 				self.background.drawRect(-80,-80,windowWidth + 160, windowHeight + 160);
 			}});
 		}
@@ -460,8 +463,11 @@ var GameScreen = AbstractScreen.extend({
 		earth.append(TweenLite.to(this.container, 0.2, {y:0, x:0}));
 	},
 	updateCoins:function(){
+
+		console.log(APP.points);
 		this.coinsLabel.setText(APP.points);
-		TweenLite.to(this.coinsLabel, 0.5, {delay:1, alpha:0.5});
+		TweenLite.to(this.coinsLabel, 0.2, {alpha:0.5});
+		// this.coinsLabel.alpha = 0.5;
 		this.coinsLabel.position.x = windowWidth / 2 - this.coinsLabel.width / 2 / this.coinsLabel.resolution;
 		this.coinsLabel.position.y = windowHeight / 2 - this.coinsLabel.height / 2 / this.coinsLabel.resolution;
 		if(this.background.parent){
@@ -486,6 +492,7 @@ var GameScreen = AbstractScreen.extend({
 
 	},
 	initLevel:function(whereInit){
+		APP.points = 0;
 		this.player = new Ball({x:0,y:0}, this);
 		this.player.build();
 		this.layer.addChild(this.player);
@@ -494,7 +501,6 @@ var GameScreen = AbstractScreen.extend({
 		var base = windowHeight / 1.2;
 		this.player.setFloor(base);
 		this.brilhoBase.getContent().position.y = base +  this.player.spriteBall.height / 2;
-		TweenLite.from(this.brilhoBase.getContent().position, 0.5, {delay:0.2, y:windowHeight});
 
 		this.targetJump = new Coin({x:0,y:0});
 		this.targetJump.build();
@@ -502,24 +508,37 @@ var GameScreen = AbstractScreen.extend({
 		this.targetJump.getContent().position.x = windowWidth / 2;
 		this.targetJump.getContent().position.y = windowHeight * 0.2;
 
-		TweenLite.from(this.targetJump.getContent().position, 0.5, {delay:0.4, y:-100});
+		this.updateCoins();
 
-		TweenLite.to(this.crazyContent, 0.5, {delay:1, alpha:1});
+		var self = this;
+		this.addChild(self.hitTouch);
+		TweenLite.from(this.layer.getContent().position, 3.5, {y:50, x:-windowWidth / 2, ease:'easeOutElastic', onComplete:function(){
+			self.addCrazyMessage('TAP AND HOLD');
+		}});
+
+		// this.coinsLabel.position.x = windowWidth / 2 - this.coinsLabel.width / 2 / this.coinsLabel.resolution;
+		// this.coinsLabel.position.y = windowHeight / 2 - this.coinsLabel.height / 2 / this.coinsLabel.resolution;
+
+		TweenLite.from(this.coinsLabel.position, 4, {y:this.coinsLabel.position.y+50, x:this.coinsLabel.position.x-windowWidth / 2, ease:'easeOutElastic', onComplete:function(){
+		}});
+
+		// TweenLite.from(this.brilhoBase.getContent().position, 0.5, {delay:0.2, y:windowHeight});
+		// TweenLite.from(this.targetJump.getContent().position, 0.5, {delay:0.4, y:-100});
+		// TweenLite.to(this.crazyContent, 0.5, {delay:1, alpha:1});
+
 
 		this.force = 0;
 		this.levelCounter = 800;
 		this.levelCounterMax = 800;
 
-		APP.points = 0;
 
-		this.updateCoins();
+		// this.updateCoins();
 		this.changeColor(true, true);
 
 		this.endGame = false;
 
-		this.addCrazyMessage('TAP AND HOLD');
+		
 
-		this.addChild(this.hitTouch);
 
 	},
 	

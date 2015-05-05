@@ -1,6 +1,20 @@
 /*jshint undef:false */
 var CookieManager = Class.extend({
 	init:function(){
+
+		function getLocalStorage() {
+			try {
+				if(window.localStorage ){
+					return window.localStorage;
+				}
+			}
+			catch (e)
+			{
+				return undefined;
+			}
+		}
+		this.db = getLocalStorage();
+
 	},
 	setCookie:function(cname, cvalue, exdays){
 		var d = new Date();
@@ -14,6 +28,9 @@ var CookieManager = Class.extend({
 	},
 
 	setSafeCookie: function (key, value) {
+		if(this.db){
+			this.db.setItem(key, value);
+		}
 		if(!window.intel){
 			return this.setCookie(key, value);
 		}
@@ -25,6 +42,9 @@ var CookieManager = Class.extend({
 	},
 
 	getSafeCookie: function (key, callback) {
+		if(this.db){
+			this.db.getItem(key);
+		}
 		if(!window.intel){
 			return this.getCookie(key);
 		}

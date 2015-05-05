@@ -25,7 +25,8 @@ var LoadScreen = AbstractScreen.extend({
         this.loaderContainer = new PIXI.DisplayObjectContainer();
         this.addChild(this.loaderContainer);
 
-        this.loaderBar = new LifeBarHUD(windowWidth * 0.6, barHeight, 0, 0x9d47e0, 0x13c2b6);
+        this.loaderBar = new LifeBarHUD(windowWidth * 0.6, barHeight, 0, 0xFFFFFF, addBright(APP.vecColors[APP.currentColorID], 0.65));
+        // this.loaderBar = new LifeBarHUD(windowWidth * 0.6, barHeight, 0, 0x9d47e0, 0x13c2b6);
         this.loaderContainer.addChild(this.loaderBar.getContent());
         this.loaderBar.getContent().position.x = windowWidth / 2 - this.loaderBar.getContent().width / 2;
         this.loaderBar.getContent().position.y = windowHeight - this.loaderBar.getContent().height - windowHeight * 0.1;
@@ -33,7 +34,7 @@ var LoadScreen = AbstractScreen.extend({
         this._super();
 
         var text = new PIXI.Text('PLAY', {font:'50px Vagron', fill:'#FFFFFF'});
-       
+
         this.addChild(text);
         text.alpha = 0;
         //gambiarra pra forçar a fonte
