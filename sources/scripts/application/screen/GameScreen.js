@@ -3,7 +3,17 @@ var GameScreen = AbstractScreen.extend({
 	init: function (label) {
 		this._super(label);
 		this.isLoaded = false;
-		this.pinDefaultVelocity = 3;
+		this.fistTime = false;
+
+		this.vecColors = [0xD031F2,0xFF562D,0x9E1EE8,0x5AF271];
+		this.vecColorsS = ['#D031F2','#FF562D','#9E1EE8','#5AF271'];
+		this.vecPerfects = ['PERFECT!', 'AWESOME!', 'AMAZING!', 'GOD!!!'];
+		this.vecGood = ['GOOD', 'COOL', 'YO', 'NOT BAD'];
+		this.vecError = ['NOOOO!', 'BAD', '=(', 'NOT'];
+		this.currentColorID = Math.floor(this.vecColors.length * Math.random());
+
+		this.backColor = this.vecColors[this.currentColorID];
+
 	},
 	destroy: function () {
 		this._super();
@@ -29,31 +39,37 @@ var GameScreen = AbstractScreen.extend({
 		this.initApplication();
 	},
 	initApplication:function(){
+		
 		var self = this;
-	   
-		this.vecColors = [0xFFCE62,0xE87C1E,0xFF562D,0xE81E55,0xE621FF];
-		this.vecPerfects = ['PERFECT!', 'AWESOME!', 'AMAZING!', 'GOD!!!'];
-		this.vecGood = ['GOOD', 'COOL', 'YO', 'NOT BAD'];
-		this.vecError = ['NOOOO!', 'BAD', '=(', 'NOT'];
-		this.backColor = 0x452E69;
-		this.background = new PIXI.Graphics();
-		this.background.beginFill(this.backColor);
+		
 
-		this.interactiveBackground = new InteractiveBackground(this);
-		this.interactiveBackground.build();
-		this.addChild(this.interactiveBackground);
+		if(!this.background){
+			this.background = new PIXI.Graphics();
+			this.background.beginFill(this.backColor);
+			this.background.drawRect(0,0,windowWidth, windowHeight);
+			this.addChild(this.background);
+		}else{
+			this.addChild(this.background);
 
+		}
+		
+		if(!this.interactiveBackground){
+			this.interactiveBackground = new InteractiveBackground(this);
+			this.interactiveBackground.build();
+			this.addChild(this.interactiveBackground);
+		}else{
+			this.addChild(this.interactiveBackground);
+
+		}
 		// this.changeColor();
 		// this.background.alpha = 0;
 
-		this.background.drawRect(0,0,windowWidth, windowHeight);
-		this.addChild(this.background);
 
 		this.hitTouch = new PIXI.Graphics();
 		this.hitTouch.interactive = true;
 		this.hitTouch.beginFill(0);
 		this.hitTouch.drawRect(0,0,windowWidth, windowHeight);
-		this.addChild(this.hitTouch);
+		
 		this.hitTouch.alpha = 0;
 		this.hitTouch.hitArea = new PIXI.Rectangle(0, 0, windowWidth, windowHeight);
 
@@ -118,6 +134,7 @@ var GameScreen = AbstractScreen.extend({
 		this.brilhoBase.getContent().alpha = 0.5;
 		scaleConverter(this.brilhoBase.getContent().width, windowWidth, 1, this.brilhoBase);
 		this.brilhoBase.getContent().position.x = windowWidth / 2 - this.brilhoBase.getContent().width / 2;
+		this.brilhoBase.getContent().position.y = windowHeight;
 		
 
 
@@ -135,13 +152,12 @@ var GameScreen = AbstractScreen.extend({
 
 
 		this.coinsLabel = new PIXI.Text('0', {align:'center',font:'72px Vagron', fill:'#FFFFFF', wordWrap:true, wordWrapWidth:500});
-		scaleConverter(this.coinsLabel.height, windowHeight, 0.2, this.coinsLabel);
-		this.coinsLabel.alpha = 0.5;
+		// scaleConverter(this.coinsLabel.height, windowHeight, 0.2, this.coinsLabel);
+		this.coinsLabel.alpha = 0;
 		this.addChild(this.coinsLabel);
 
 		this.crazyContent = new PIXI.DisplayObjectContainer();
 		this.addChild(this.crazyContent);
-		this.addCrazyMessage('TAP AND HOLD');
 		
 
 		this.loaderBar = new LifeBarHUD(windowWidth, 20, 0, 0xFFFFFF, 0xFFFFFF);
@@ -151,7 +167,15 @@ var GameScreen = AbstractScreen.extend({
 		this.loaderBar.updateBar(0, 100);
 		this.loaderBar.getContent().alpha = 0;
 
-		this.initLevel();
+		// this.initLevel();
+		// this.endGame = true;
+		if(!this.fistTime){
+			this.changeColor(true, true);
+			this.openEndMenu();
+			this.fistTime = true;
+		}else{
+			this.initLevel();
+		}
 		this.startLevel = false;
 		
 	},
@@ -258,34 +282,86 @@ var GameScreen = AbstractScreen.extend({
 		if(!this.updateable){
 			return;
 		}
-		if(!this.player.inError){
-			if(this.tapDown && this.force < 30){
-				this.force += 0.9;
-				this.player.charge();
-				// console.log(this.force);
-			}
-			// console.log(this.startLevel);
-			if(this.startLevel){
-				this.levelCounter --;
-				if(this.levelCounter < 0){
-					this.levelCounter = 0;
+		if(this.player){
+			if(!this.player.inError){
+				if(this.tapDown && this.force < 30){
+					this.force += 0.9;
+					this.player.charge();
+					// console.log(this.force);
+				}
+				// console.log(this.startLevel);
+				if(this.startLevel){
+					this.levelCounter --;
+					if(this.levelCounter < 0){
+						this.levelCounter = 0;
+					}
 				}
 			}
-		}
-		this.player.force = this.force;
-		if(this.player.velocity.y < 0){
-			this.interactiveBackground.accel =  Math.abs(this.player.velocity.y) / 15;
+			this.player.force = this.force;
+			if(this.player.velocity.y < 0){
+				this.interactiveBackground.gravity =  Math.abs(this.player.velocity.y) / 15;
+			}else{
+				this.interactiveBackground.gravity = 0;
+			}
+			if(this.levelCounter <= 0){
+				this.gameOver();
+			}
+			this.loaderBar.updateBar(this.levelCounter, this.levelCounterMax);
 		}else{
-			this.interactiveBackground.accel = 0;
+			this.interactiveBackground.gravity =  1;
 		}
-		if(this.levelCounter <= 0){
-			this.gameOver();
-		}
-		this.loaderBar.updateBar(this.levelCounter, this.levelCounterMax);
 		this._super();
 	},
 	gameOver:function(){
-		this.reset();
+		if(this.endGame){
+			return;
+		}
+		this.player.preKill();
+		this.targetJump.preKill();
+		this.earthquake(40);
+		this.endGame = true;
+		this.crazyContent.alpha = 0;
+		this.coinsLabel.alpha = 0;
+		this.brilhoBase.getContent().alpha = 0;
+		this.loaderBar.getContent().alpha = 0;
+
+		this.interactiveBackground.accel = -5;
+		this.hitTouch.parent.removeChild(this.hitTouch);
+		var self = this;
+		setTimeout(function(){
+			self.openEndMenu();
+		}, 500);
+		// this.reset();
+	},
+	openEndMenu:function(){
+
+		this.playAgainContainer = new PIXI.DisplayObjectContainer();
+		this.playAgainButton = new PIXI.Graphics();
+		this.playAgainButton.beginFill(0xFFFFFF);
+		this.playAgainButton.drawRect(0,0,100, 60);
+		this.playAgainLabel = new PIXI.Text('PLAY', {align:'center',font:'30px Vagron', fill:this.vecColorsS[this.currentColorID], wordWrap:true, wordWrapWidth:500});
+		this.playAgainLabel.position.x = 15;
+		this.playAgainLabel.position.y = 10;
+		this.playAgainContainer.addChild(this.playAgainButton);
+		this.playAgainContainer.addChild(this.playAgainLabel);
+
+		this.addChild(this.playAgainContainer);
+		this.playAgainContainer.position.x = windowWidth / 2 - this.playAgainContainer.width / 2;
+		this.playAgainContainer.position.y = windowHeight / 2 - this.playAgainContainer.height / 2;
+
+		TweenLite.from(this.playAgainContainer, 5, {x: windowWidth * 1.1, y:this.playAgainContainer.position.y - 50, ease:'easeOutElastic'});
+		TweenLite.to(this.interactiveBackground, 2, {accel:0});
+
+		this.playAgainContainer.interactive = true;
+
+		var self = this;
+		this.playAgainContainer.touchend = this.playAgainContainer.mouseup = function(mouseData){
+			TweenLite.to(self.playAgainContainer, 1.5, {x: windowWidth * 1.1, y:windowHeight / 2 - self.playAgainContainer.height / 2 - 50, ease:'easeOutCubic', onComplete:function(){
+				self.reset();
+			}});
+			self.interactiveBackground.accel = 5;
+			TweenLite.to(self.interactiveBackground, 2, {accel:0});
+		};
 	},
 	addRegularLabel:function(label, font){
 		var rot = Math.random() * 0.004;
@@ -318,7 +394,6 @@ var GameScreen = AbstractScreen.extend({
 	},
 	getPerfect:function(){
 		this.addRegularLabel(this.vecPerfects[Math.floor(this.vecPerfects.length * Math.random())], '50px Vagron');
-		
 		this.earthquake(40);
 	},
 	getCoin:function(isPerfect){
@@ -337,11 +412,14 @@ var GameScreen = AbstractScreen.extend({
 		this.earthquake(20);
 		this.changeColor();
 	},
-	changeColor:function(force){
+	changeColor:function(force, first){
 		var tempColor = 0;
 		var self = this;
-		var temptempColor = this.vecColors[Math.floor(this.vecColors.length * Math.random())];
-
+		if(!first){
+			console.log('randomHEre');
+			this.currentColorID = Math.floor(this.vecColors.length * Math.random());
+		}
+		var temptempColor = this.vecColors[this.currentColorID];
 		if(force){
 			self.background.clear();
 			self.background.beginFill(temptempColor);
@@ -353,7 +431,9 @@ var GameScreen = AbstractScreen.extend({
 				self.background.drawRect(-80,-80,windowWidth + 160, windowHeight + 160);
 			}});
 		}
-
+		if(!this.player){
+			return;
+		}
 		tempColor = addBright(temptempColor, 0.65);
 		// this.player.spriteBall.tint = tempColor;
 		this.player.setColor(tempColor);
@@ -368,10 +448,28 @@ var GameScreen = AbstractScreen.extend({
 	},
 	updateCoins:function(){
 		this.coinsLabel.setText(APP.points);
+		TweenLite.to(this.coinsLabel, 0.5, {delay:1, alpha:0.5});
 		this.coinsLabel.position.x = windowWidth / 2 - this.coinsLabel.width / 2;
 		this.coinsLabel.position.y = windowHeight / 2 - this.coinsLabel.height / 2;
-		this.background.parent.setChildIndex(this.background, 0);
+		if(this.background.parent){
+			this.background.parent.setChildIndex(this.background, 0);
+		}
 		this.coinsLabel.parent.setChildIndex(this.coinsLabel, 1);
+
+		if(this.coinsLabel.alpha < 0.5){
+			return;
+		}
+		var tempCoins = new PIXI.Text(APP.points, {align:'center',font:'72px Vagron', fill:'#FFFFFF', wordWrap:true, wordWrapWidth:500});
+		tempCoins.anchor = {x:0.5, y:0.5};
+		var particle = new Particles({x: 0, y:0}, 120, tempCoins,0);
+		particle.maxScale = 5;
+		particle.maxInitScale = 1;
+		particle.build();
+		particle.alphadecress = 0.02;
+		particle.scaledecress = +0.02;
+		particle.setPosition(this.coinsLabel.position.x + tempCoins.width / 2, this.coinsLabel.position.y + tempCoins.height / 2);
+		this.layer.addChild(particle);
+
 	},
 	initLevel:function(whereInit){
 		this.player = new Ball({x:0,y:0}, this);
@@ -382,6 +480,7 @@ var GameScreen = AbstractScreen.extend({
 		var base = windowHeight / 1.2;
 		this.player.setFloor(base);
 		this.brilhoBase.getContent().position.y = base +  this.player.spriteBall.height / 2;
+		TweenLite.from(this.brilhoBase.getContent().position, 0.5, {delay:0.2, y:windowHeight});
 
 		this.targetJump = new Coin({x:0,y:0});
 		this.targetJump.build();
@@ -389,7 +488,9 @@ var GameScreen = AbstractScreen.extend({
 		this.targetJump.getContent().position.x = windowWidth / 2;
 		this.targetJump.getContent().position.y = windowHeight * 0.2;
 
-		TweenLite.to(this.crazyContent, 0.5, {alpha:1});
+		TweenLite.from(this.targetJump.getContent().position, 0.5, {delay:0.4, y:-100});
+
+		TweenLite.to(this.crazyContent, 0.5, {delay:1, alpha:1});
 
 		this.force = 0;
 		this.levelCounter = 800;
@@ -398,7 +499,14 @@ var GameScreen = AbstractScreen.extend({
 		APP.points = 0;
 
 		this.updateCoins();
-		this.changeColor(true);
+		this.changeColor(true, true);
+
+		this.endGame = false;
+
+		this.addCrazyMessage('TAP AND HOLD');
+
+		this.addChild(this.hitTouch);
+
 	},
 	
 	transitionIn:function()

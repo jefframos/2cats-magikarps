@@ -320,17 +320,39 @@ var Ball = Entity.extend({
 		}
 		this.collidable = false;
 		this.kill = true;
-		for (var i = 8; i >= 0; i--) {
-			console.log('coll');
-			var particle = new Particles({x: Math.random() * 4, y:-(Math.random() * 2 + 1)}, 120, this.particleSource, Math.random() * 0.05);
+		for (var i = 10; i >= 0; i--) {
+
+			tempParticle = new PIXI.Graphics();
+			tempParticle.beginFill(this.color);
+			tempParticle.drawCircle(0,0,this.spriteBall.width * 0.2);
+			// this.spriteBall.drawCircle(0,0,windowHeight * 0.02);
+
+			particle = new Particles({x: Math.random() * 10 - 5, y:Math.random() * 10 - 5}, 600, tempParticle, Math.random() * 0.05);
+			// particle.maxScale = this.getContent().scale.x / 2;
+            // particle.maxInitScale = particle.maxScale;
 			particle.build();
-			// particle.gravity = 0.1 * Math.random() + 0.2;
-			particle.alphadecres = 0.1;
-			particle.getContent().tint = APP.appModel.currentPlayerModel.color;
-			particle.scaledecress = 0.02;
-			particle.setPosition(this.getPosition().x - (Math.random() + this.getContent().width * 0.1) / 2,
-				this.getPosition().y - this.spriteBall.height / 2);
+			// particle.getContent().tint = 0xf5c30c;
+			// particle.gravity = 0.3 * Math.random();
+			particle.alphadecress = 0.008;
+			// particle.scaledecress = -0.005;
+			particle.setPosition(this.getPosition().x - (Math.random() + this.getContent().width * 0.4) + this.getContent().width * 0.2,
+                this.getPosition().y - (Math.random() + this.getContent().width * 0.4)+ this.getContent().width * 0.2);
 			this.layer.addChild(particle);
 		}
+
+		tempParticle = new PIXI.Graphics();
+		tempParticle.beginFill(this.color);
+		tempParticle.drawCircle(0,0,this.spriteBall.width);
+
+		particle = new Particles({x: 0, y:0}, 600, tempParticle, 0);
+		particle.maxScale = this.getContent().scale.x * 5;
+        particle.maxInitScale = 1;
+		particle.build();
+		// particle.getContent().tint = 0xf5c30c;
+		// particle.gravity = 0.3 * Math.random();
+		particle.alphadecress = 0.05;
+		particle.scaledecress = 0.1;
+		particle.setPosition(this.getPosition().x,this.getPosition().y);
+		this.layer.addChild(particle);
 	},
 });

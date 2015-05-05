@@ -170,19 +170,20 @@ var Coin = Entity.extend({
 
 		
 
-		for (var i = 5; i >= 0; i--) {
-			var particle = new Particles({x: Math.random() * 8 - 4, y:Math.random() * 8 - 4}, 120, this.particleSource, Math.random() * 0.05);
-			particle.maxScale = this.getContent().scale.x / 2;
-            particle.maxInitScale = particle.maxScale;
-			particle.build();
-			particle.getContent().tint = 0xf5c30c;
-			particle.gravity = 0.3 * Math.random();
-			particle.alphadecress = 0.04;
-			particle.scaledecress = -0.05;
-			particle.setPosition(this.getPosition().x - (Math.random() + this.getContent().width * 0.4) + this.getContent().width * 0.2,
-                this.getPosition().y - (Math.random() + this.getContent().width * 0.4)+ this.getContent().width * 0.2);
-			this.layer.addChild(particle);
-		}
+		// for (var i = 5; i >= 0; i--) {
+		// 	var particle = new Particles({x: Math.random() * 8 - 4, y:Math.random() * 8 - 4}, 120, this.particleSource, Math.random() * 0.05);
+		// 	particle.maxScale = this.getContent().scale.x / 2;
+  //           particle.maxInitScale = particle.maxScale;
+		// 	particle.build();
+		// 	particle.getContent().tint = 0xf5c30c;
+		// 	particle.gravity = 0.3 * Math.random();
+		// 	particle.alphadecress = 0.04;
+		// 	particle.scaledecress = -0.05;
+		// 	particle.setPosition(this.getPosition().x - (Math.random() + this.getContent().width * 0.4) + this.getContent().width * 0.2,
+  //               this.getPosition().y - (Math.random() + this.getContent().width * 0.4)+ this.getContent().width * 0.2);
+		// 	this.layer.addChild(particle);
+		// }
+		this.explode();
 		this.collidable = false;
 		this.kill = true;
 	},
