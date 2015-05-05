@@ -2312,7 +2312,7 @@ var Application = AbstractApplication.extend({
             accel: 0
         }), this.playAgainContainer.interactive = !0;
         var self = this;
-        this.playAgainContainer.touchend = this.playAgainContainer.mouseup = function(mouseData) {
+        this.playAgainContainer.touchstart = this.playAgainContainer.mousedown = function(mouseData) {
             TweenLite.to(self.playAgainContainer, 1.5, {
                 x: 1.1 * windowWidth,
                 y: windowHeight / 2 - self.playAgainContainer.height / 2 - 50,

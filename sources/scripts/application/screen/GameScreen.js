@@ -355,7 +355,8 @@ var GameScreen = AbstractScreen.extend({
 		this.playAgainContainer.interactive = true;
 
 		var self = this;
-		this.playAgainContainer.touchend = this.playAgainContainer.mouseup = function(mouseData){
+		// this.playAgainContainer.touchend = this.playAgainContainer.mouseup = function(mouseData){
+		this.playAgainContainer.touchstart = this.playAgainContainer.mousedown = function(mouseData){
 			TweenLite.to(self.playAgainContainer, 1.5, {x: windowWidth * 1.1, y:windowHeight / 2 - self.playAgainContainer.height / 2 - 50, ease:'easeOutCubic', onComplete:function(){
 				self.reset();
 			}});
