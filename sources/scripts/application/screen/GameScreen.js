@@ -314,8 +314,13 @@ var GameScreen = AbstractScreen.extend({
 	},
 	gameOver:function(){
 		if(this.endGame){
+			this.crazyContent.alpha = 0;
+			this.coinsLabel.alpha = 0;
+			this.brilhoBase.getContent().alpha = 0;
+			this.loaderBar.getContent().alpha = 0;
 			return;
 		}
+		this.hitTouch.parent.removeChild(this.hitTouch);
 		this.player.preKill();
 		this.targetJump.preKill();
 		this.earthquake(40);
@@ -326,7 +331,6 @@ var GameScreen = AbstractScreen.extend({
 		this.loaderBar.getContent().alpha = 0;
 
 		this.interactiveBackground.accel = -5;
-		this.hitTouch.parent.removeChild(this.hitTouch);
 		var self = this;
 		setTimeout(function(){
 			self.openEndMenu();
@@ -388,17 +392,21 @@ var GameScreen = AbstractScreen.extend({
 		perfect2.setPosition(this.player.getPosition().x - tempLabel.width / 2 + 2, this.player.getPosition().y + 50 + 2);
 		this.layer.addChild(perfect2);
 
-		this.levelCounter += this.levelCounterMax * 0.02;
-		if(this.levelCounter > this.levelCounterMax){
-			this.levelCounter = this.levelCounterMax;
-		}
+		// this.levelCounter += this.levelCounterMax * 0.02;
+		// if(this.levelCounter > this.levelCounterMax){
+		// 	this.levelCounter = this.levelCounterMax;
+		// }
 	},
 	getPerfect:function(){
 		this.addRegularLabel(this.vecPerfects[Math.floor(this.vecPerfects.length * Math.random())], '50px Vagron');
 		this.earthquake(40);
+		this.levelCounter += this.levelCounterMax * 0.1;
+		if(this.levelCounter > this.levelCounterMax){
+			this.levelCounter = this.levelCounterMax;
+		}
 	},
 	getCoin:function(isPerfect){
-		this.levelCounter += this.levelCounterMax * 0.03;
+		this.levelCounter += this.levelCounterMax * 0.04;
 		if(this.levelCounter > this.levelCounterMax){
 			this.levelCounter = this.levelCounterMax;
 		}

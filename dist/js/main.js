@@ -2281,15 +2281,15 @@ var Application = AbstractApplication.extend({
         this._super());
     },
     gameOver: function() {
-        if (!this.endGame) {
-            this.player.preKill(), this.targetJump.preKill(), this.earthquake(40), this.endGame = !0, 
-            this.crazyContent.alpha = 0, this.coinsLabel.alpha = 0, this.brilhoBase.getContent().alpha = 0, 
-            this.loaderBar.getContent().alpha = 0, this.interactiveBackground.accel = -5, this.hitTouch.parent.removeChild(this.hitTouch);
-            var self = this;
-            setTimeout(function() {
-                self.openEndMenu();
-            }, 500);
-        }
+        if (this.endGame) return this.crazyContent.alpha = 0, this.coinsLabel.alpha = 0, 
+        this.brilhoBase.getContent().alpha = 0, void (this.loaderBar.getContent().alpha = 0);
+        this.hitTouch.parent.removeChild(this.hitTouch), this.player.preKill(), this.targetJump.preKill(), 
+        this.earthquake(40), this.endGame = !0, this.crazyContent.alpha = 0, this.coinsLabel.alpha = 0, 
+        this.brilhoBase.getContent().alpha = 0, this.loaderBar.getContent().alpha = 0, this.interactiveBackground.accel = -5;
+        var self = this;
+        setTimeout(function() {
+            self.openEndMenu();
+        }, 500);
     },
     openEndMenu: function() {
         this.playAgainContainer = new PIXI.DisplayObjectContainer(), this.playAgainButton = new PIXI.Graphics(), 
@@ -2345,15 +2345,14 @@ var Application = AbstractApplication.extend({
         }), -rot);
         perfect2.maxScale = this.player.getContent().scale.x, perfect2.build(), perfect2.gravity = -.2, 
         perfect2.alphadecress = .01, perfect2.scaledecress = .05, perfect2.setPosition(this.player.getPosition().x - tempLabel.width / 2 + 2, this.player.getPosition().y + 50 + 2), 
-        this.layer.addChild(perfect2), this.levelCounter += .02 * this.levelCounterMax, 
-        this.levelCounter > this.levelCounterMax && (this.levelCounter = this.levelCounterMax);
+        this.layer.addChild(perfect2);
     },
     getPerfect: function() {
         this.addRegularLabel(this.vecPerfects[Math.floor(this.vecPerfects.length * Math.random())], "50px Vagron"), 
-        this.earthquake(40);
+        this.earthquake(40), this.levelCounter += .1 * this.levelCounterMax, this.levelCounter > this.levelCounterMax && (this.levelCounter = this.levelCounterMax);
     },
     getCoin: function(isPerfect) {
-        this.levelCounter += .03 * this.levelCounterMax, this.levelCounter > this.levelCounterMax && (this.levelCounter = this.levelCounterMax), 
+        this.levelCounter += .04 * this.levelCounterMax, this.levelCounter > this.levelCounterMax && (this.levelCounter = this.levelCounterMax), 
         this.targetJump.randomPos(.05 * windowHeight, .4 * windowHeight), this.updateCoins(), 
         this.targetJump.explode(), isPerfect || this.addRegularLabel(this.vecGood[Math.floor(this.vecGood.length * Math.random())], "30px Vagron"), 
         this.earthquake(20), this.changeColor();
