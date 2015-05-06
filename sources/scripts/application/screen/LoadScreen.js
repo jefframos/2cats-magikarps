@@ -3,7 +3,7 @@ var LoadScreen = AbstractScreen.extend({
     init: function (label) {
         this._super(label);
         this.isLoaded = false;
-        
+
         // alert(this.isLoaded);
     },
     destroy: function () {
@@ -12,7 +12,7 @@ var LoadScreen = AbstractScreen.extend({
     build: function () {
         this._super();
 
-        var assetsToLoader = ['dist/img/atlas1.json'];
+        var assetsToLoader = [];
         if(assetsToLoader.length > 0 && !this.isLoaded){
             this.loader = new PIXI.AssetLoader(assetsToLoader);
             this.initLoad();
@@ -46,11 +46,22 @@ var LoadScreen = AbstractScreen.extend({
     },
     onAssetsLoaded:function()
     {
+        var text = new PIXI.Text('PLAY', {font:'50px Vagron', fill:'#FFFFFF'});
+        this.addChild(text);
+        text.alpha = 0;
+
         this.ready = true;
         var self = this;
-        TweenLite.to(this.loaderBar.getContent(), 0.5, {delay:0.2, alpha:0, onComplete:function(){
-            self.initApplication();
-        }});
+        if(this.loaderBar){
+            TweenLite.to(this.loaderBar.getContent(), 0.5, {delay:0.2, alpha:0, onComplete:function(){
+                self.initApplication();
+            }});
+        }else{
+            TweenLite.to(text, 0.5, {delay:0.2, alpha:0, onComplete:function(){
+                self.initApplication();
+            }});
+            // this.initApplication();
+        }
     },
     initApplication:function(){
         this.isLoaded = true;

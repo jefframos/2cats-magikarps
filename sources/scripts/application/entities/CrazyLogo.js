@@ -11,24 +11,25 @@ var CrazyLogo = Entity.extend({
 	},
 	build: function(){
 		this.updateable = true;
-		for (var i = 0; i < this.title.length; i++) {
-			// console.log(this.title[i]);
+		var before = 0;
+		for (var i = 1; i <= this.title.length; i++) {
 			// var tempText = new PIXI.Text(this.title[i], {align:'center',font:'48px Vagron',fill:'#FFFFFF', stroke});
 			// tempText.resolution = retina;
 			// tempText.position.x = i * 70 / tempText.resolution + 2;
 			// tempText.position.y = 2;
 			// this.container.addChild(tempText);
 
-			tempText = new PIXI.Text(this.title[i], {align:'center',font:'48px Vagron', fill:APP.vecColorsS[this.tempCounter], stroke:'#FFFFFF', strokeThickness:5});
+			tempText = new PIXI.Text(this.title[i - 1], {align:'center',font:'48px Vagron', fill:APP.vecColorsS[this.tempCounter], stroke:'#FFFFFF', strokeThickness:5});
+			console.log(this.title[i - 1], tempText.width);
 			// tempText = new PIXI.Text(this.title[i], {align:'center',font:'48px Vagron', fill:APP.vecColorsS[this.tempCounter]});//, stroke:'#FFFFFF', strokeThickness:3});
-			tempText.resolution = retina;
+			tempText.resolution = 2;
 			tempText.sin = i * 0.5;
-			tempText.position.x = i * 17 * tempText.resolution;
+			tempText.position.x =this.container.width + before / 4 - 35 / 2;
 			tempText.position.y = Math.sin(tempText.sin) * 10;
 			console.log(tempText.position.y);
 			this.container.addChild(tempText);
 
-
+			before = tempText.width;
 			this.vecLetters.push(tempText);
 			this.tempCounter ++;
 			if(this.tempCounter >= APP.vecColorsS.length){

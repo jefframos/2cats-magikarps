@@ -171,7 +171,9 @@ function fullscreen(){
 // alert(window.intel);
 
 // window.intel = true;
+window.console.log = function(){
 
+};
 (function() {
 	var App = {
 		init: function () {

@@ -94,30 +94,30 @@ var GameScreen = AbstractScreen.extend({
 
 
 
-		this.pauseButton = new DefaultButton('UI_button_default_1.png', 'UI_button_default_1.png', 'UI_button_default_1.png');
-		this.pauseButton.build();
-		scaleConverter(this.pauseButton.getContent().width, windowWidth, 0.1, this.pauseButton);
-		this.pauseButton.setPosition(20,20);
-		// this.addChild(this.pauseButton);
+		// this.pauseButton = new DefaultButton('UI_button_default_1.png', 'UI_button_default_1.png', 'UI_button_default_1.png');
+		// this.pauseButton.build();
+		// scaleConverter(this.pauseButton.getContent().width, windowWidth, 0.1, this.pauseButton);
+		// this.pauseButton.setPosition(20,20);
+		// // this.addChild(this.pauseButton);
 	  
-		this.pauseButton.clickCallback = function(){
-			self.pauseModal.show();
-		};
+		// this.pauseButton.clickCallback = function(){
+		// 	self.pauseModal.show();
+		// };
 
-		this.backButton = new DefaultButton('UI_button_default_1.png', 'UI_button_default_1.png');
-		this.backButton.build();
-		this.backButton.addLabel(new PIXI.Text('BACK', {font:'50px Vagron', fill:'#FFFFFF'}), 40);
-		scaleConverter(this.backButton.getContent().width, windowWidth, 0.4, this.backButton);
-		this.backButton.setPosition(windowWidth / 2 - this.backButton.getContent().width/2,
-			windowHeight - this.backButton.getContent().height * 2.5);
-		// this.addChild(this.backButton);
+		// this.backButton = new DefaultButton('UI_button_default_1.png', 'UI_button_default_1.png');
+		// this.backButton.build();
+		// this.backButton.addLabel(new PIXI.Text('BACK', {font:'50px Vagron', fill:'#FFFFFF'}), 40);
+		// scaleConverter(this.backButton.getContent().width, windowWidth, 0.4, this.backButton);
+		// this.backButton.setPosition(windowWidth / 2 - this.backButton.getContent().width/2,
+		// 	windowHeight - this.backButton.getContent().height * 2.5);
+		// // this.addChild(this.backButton);
 	  
-		this.backButton.clickCallback = function(){
-			self.updateable = false;
-			self.toTween(function(){
-				self.screenManager.change('Init');
-			});
-		};
+		// this.backButton.clickCallback = function(){
+		// 	self.updateable = false;
+		// 	self.toTween(function(){
+		// 		self.screenManager.change('Init');
+		// 	});
+		// };
 
 		// this.setAudioButtons();
 		
@@ -136,12 +136,12 @@ var GameScreen = AbstractScreen.extend({
 
 
 
-		this.brilhoBase = new SimpleSprite('baseDegrade.png');
-		// this.container.addChild(this.brilhoBase.getContent());
-		this.brilhoBase.getContent().alpha = 0.5;
-		scaleConverter(this.brilhoBase.getContent().width, windowWidth, 1, this.brilhoBase);
-		this.brilhoBase.getContent().position.x = windowWidth / 2 - this.brilhoBase.getContent().width / 2;
-		this.brilhoBase.getContent().position.y = windowHeight;
+		// this.brilhoBase = new SimpleSprite('baseDegrade.png');
+		// // this.container.addChild(this.brilhoBase.getContent());
+		// this.brilhoBase.getContent().alpha = 0.5;
+		// scaleConverter(this.brilhoBase.getContent().width, windowWidth, 1, this.brilhoBase);
+		// this.brilhoBase.getContent().position.x = windowWidth / 2 - this.brilhoBase.getContent().width / 2;
+		// this.brilhoBase.getContent().position.y = windowHeight;
 		
 
 
@@ -329,7 +329,7 @@ var GameScreen = AbstractScreen.extend({
 		if(this.endGame){
 			this.crazyContent.alpha = 0;
 			this.coinsLabel.alpha = 0;
-			this.brilhoBase.getContent().alpha = 0;
+			// this.brilhoBase.getContent().alpha = 0;
 			this.loaderBar.getContent().alpha = 0;
 			return;
 		}
@@ -340,7 +340,7 @@ var GameScreen = AbstractScreen.extend({
 		this.endGame = true;
 		this.crazyContent.alpha = 0;
 		this.coinsLabel.alpha = 0;
-		this.brilhoBase.getContent().alpha = 0;
+		// this.brilhoBase.getContent().alpha = 0;
 		this.loaderBar.getContent().alpha = 0;
 
 		this.interactiveBackground.accel = -5;
@@ -361,49 +361,50 @@ var GameScreen = AbstractScreen.extend({
 			APP.highscore = APP.points;
 		}
 		// if(APP.points)
-		var scoreContainer = new PIXI.DisplayObjectContainer();
-		var scoreBack = new PIXI.Graphics();
-		scoreBack.beginFill(0xFFFFFF);
-		scoreBack.drawRoundedRect(0,0,160, 125,5);
-		scoreContainer.addChild(scoreBack);
+		if(this.fistTime){
+			var scoreContainer = new PIXI.DisplayObjectContainer();
+			var scoreBack = new PIXI.Graphics();
+			scoreBack.beginFill(0xFFFFFF);
+			scoreBack.drawRoundedRect(0,0,160, 125,5);
+			scoreContainer.addChild(scoreBack);
+
+			var currentScoreTitle = new PIXI.Text('SCORE', {align:'center',font:'18px Vagron', fill:APP.vecColorsS[APP.currentColorID], wordWrap:true, wordWrapWidth:100});
+			scoreContainer.addChild(currentScoreTitle);
+			currentScoreTitle.resolution = retina;
+
+			currentScoreTitle.position.x = scoreBack.width / 2 - currentScoreTitle.width / 2 / currentScoreTitle.resolution;
+			currentScoreTitle.position.y = 10;
 
 
-		var currentScoreTitle = new PIXI.Text('SCORE', {align:'center',font:'18px Vagron', fill:APP.vecColorsS[APP.currentColorID], wordWrap:true, wordWrapWidth:100});
-		scoreContainer.addChild(currentScoreTitle);
-		currentScoreTitle.resolution = retina;
+			var currentScore = new PIXI.Text(APP.points, {align:'center',font:'30px Vagron', fill:APP.vecColorsS[APP.currentColorID], wordWrap:true, wordWrapWidth:500});
+			scoreContainer.addChild(currentScore);
+			currentScore.resolution = retina;
 
-		currentScoreTitle.position.x = scoreBack.width / 2 - currentScoreTitle.width / 2 / currentScoreTitle.resolution;
-		currentScoreTitle.position.y = 10;
-
-
-		var currentScore = new PIXI.Text(APP.points, {align:'center',font:'30px Vagron', fill:APP.vecColorsS[APP.currentColorID], wordWrap:true, wordWrapWidth:500});
-		scoreContainer.addChild(currentScore);
-		currentScore.resolution = retina;
-
-		currentScore.position.x = scoreBack.width / 2 - currentScore.width / 2 / currentScore.resolution;
-		currentScore.position.y = (currentScoreTitle.position.y + currentScoreTitle.height/ currentScoreTitle.resolution)  - 10;
+			currentScore.position.x = scoreBack.width / 2 - currentScore.width / 2 / currentScore.resolution;
+			currentScore.position.y = (currentScoreTitle.position.y + currentScoreTitle.height/ currentScoreTitle.resolution)  - 10;
 
 
-		var highscoreTitle = new PIXI.Text('HIGHSCORE', {align:'center',font:'14px Vagron', fill:APP.vecColorsS[APP.currentColorID], wordWrap:true, wordWrapWidth:100});
-		scoreContainer.addChild(highscoreTitle);
-		highscoreTitle.resolution = retina;
+			var highscoreTitle = new PIXI.Text('HIGHSCORE', {align:'center',font:'14px Vagron', fill:APP.vecColorsS[APP.currentColorID], wordWrap:true, wordWrapWidth:100});
+			scoreContainer.addChild(highscoreTitle);
+			highscoreTitle.resolution = retina;
 
-		highscoreTitle.position.x = scoreBack.width / 2 - highscoreTitle.width / 2 / highscoreTitle.resolution;
-		highscoreTitle.position.y = currentScore.position.y + currentScore.height / currentScore.resolution;
-
-
-		var highScoreLabel = new PIXI.Text(APP.highscore, {align:'center',font:'22px Vagron', fill:APP.vecColorsS[APP.currentColorID], wordWrap:true, wordWrapWidth:500});
-		scoreContainer.addChild(highScoreLabel);
-		highScoreLabel.resolution = retina;
+			highscoreTitle.position.x = scoreBack.width / 2 - highscoreTitle.width / 2 / highscoreTitle.resolution;
+			highscoreTitle.position.y = currentScore.position.y + currentScore.height / currentScore.resolution;
 
 
-		highScoreLabel.position.x = scoreBack.width / 2 - highScoreLabel.width / 2 / highScoreLabel.resolution;
-		highScoreLabel.position.y = (highscoreTitle.position.y + highscoreTitle.height / highscoreTitle.resolution) - 10;
+			var highScoreLabel = new PIXI.Text(APP.highscore, {align:'center',font:'22px Vagron', fill:APP.vecColorsS[APP.currentColorID], wordWrap:true, wordWrapWidth:500});
+			scoreContainer.addChild(highScoreLabel);
+			highScoreLabel.resolution = retina;
 
 
-		scoreContainer.position.x = windowWidth / 2 - scoreBack.width / 2;
-		scoreContainer.position.y = windowHeight/2 - scoreBack.height / 2;
-		this.endMenuContainer.addChild(scoreContainer);
+			highScoreLabel.position.x = scoreBack.width / 2 - highScoreLabel.width / 2 / highScoreLabel.resolution;
+			highScoreLabel.position.y = (highscoreTitle.position.y + highscoreTitle.height / highscoreTitle.resolution) - 10;
+
+			scoreContainer.position.x = windowWidth / 2 - scoreBack.width / 2;
+			scoreContainer.position.y = windowHeight/2 - scoreBack.height / 2;
+			this.endMenuContainer.addChild(scoreContainer);
+		}
+
 
 
 		var playAgainContainer = new PIXI.DisplayObjectContainer();
@@ -445,7 +446,7 @@ var GameScreen = AbstractScreen.extend({
 		this.crazyLogo = new CrazyLogo(this);
 		this.crazyLogo.build();
 		this.endMenuContainer.addChild(this.crazyLogo.getContent());
-		this.crazyLogo.getContent().position.x = windowWidth / 2 - this.crazyLogo.getContent().width / 2 + 12;
+		this.crazyLogo.getContent().position.x = windowWidth / 2 - this.crazyLogo.getContent().width / 2;
 		this.crazyLogo.getContent().position.y = windowHeight * 0.2;
 		TweenLite.from(this.crazyLogo.getContent(), 4.5, {x: windowWidth * 1.1, y:this.crazyLogo.getContent().position.y - 50, ease:'easeOutElastic'});
 
@@ -578,7 +579,7 @@ var GameScreen = AbstractScreen.extend({
 		this.player.getContent().position.y = windowHeight / 1.2;
 		var base = windowHeight / 1.2;
 		this.player.setFloor(base);
-		this.brilhoBase.getContent().position.y = base +  this.player.spriteBall.height / 2;
+		// this.brilhoBase.getContent().position.y = base +  this.player.spriteBall.height / 2;
 
 		this.targetJump = new Coin({x:0,y:0});
 		this.targetJump.build();
