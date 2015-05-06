@@ -20,7 +20,7 @@ var InteractiveBackground = Entity.extend({
 					dot.velocity = {x:0,y:0};
 					dot.velocity.y = 0.1 + Math.random() * 0.2;
 					dot.velocity.x = 0;
-					dot.drawRect(0,0,Math.ceil(5 *dot.velocity.y), Math.ceil(8 * dot.velocity.y));
+					dot.drawRect(0,0,Math.ceil(6 *dot.velocity.y), Math.ceil(10 * dot.velocity.y));
 					dot.position.x = this.dist * i + (Math.random()*this.dist) / 2;
 					dot.position.y = this.dist * j + (Math.random()*this.dist) / 2;
 					this.container.addChild(dot);

@@ -7,11 +7,12 @@ var CrazyLogo = Entity.extend({
 		this.title = 'EPILEPSY';
 		this.vecLetters = [];
 		this.tempCounter = 0;
-		this.colorsCounter = 3;
+		this.colorsCounter = 300;
 	},
 	build: function(){
+		this.updateable = true;
 		for (var i = 0; i < this.title.length; i++) {
-			console.log(this.title[i]);
+			// console.log(this.title[i]);
 			// var tempText = new PIXI.Text(this.title[i], {align:'center',font:'48px Vagron',fill:'#FFFFFF', stroke});
 			// tempText.resolution = retina;
 			// tempText.position.x = i * 70 / tempText.resolution + 2;
@@ -21,7 +22,10 @@ var CrazyLogo = Entity.extend({
 			tempText = new PIXI.Text(this.title[i], {align:'center',font:'48px Vagron', fill:APP.vecColorsS[this.tempCounter], stroke:'#FFFFFF', strokeThickness:5});
 			// tempText = new PIXI.Text(this.title[i], {align:'center',font:'48px Vagron', fill:APP.vecColorsS[this.tempCounter]});//, stroke:'#FFFFFF', strokeThickness:3});
 			tempText.resolution = retina;
+			tempText.sin = i * 0.5;
 			tempText.position.x = i * 17 * tempText.resolution;
+			tempText.position.y = Math.sin(tempText.sin) * 10;
+			console.log(tempText.position.y);
 			this.container.addChild(tempText);
 
 
@@ -36,19 +40,27 @@ var CrazyLogo = Entity.extend({
 		return this.container;
 	},
 	update: function(){
-		this.colorsCounter --;
-		if(this.colorsCounter > 0){
+		if(!this.updateable){
 			return;
 		}
-		this.colorsCounter = 3;
+		console.log('update here');
+		var changeColors = false;
+		this.colorsCounter --;
+		if(this.colorsCounter < 0){
+			changeColors = true;
+			this.colorsCounter = 200;
+		}
 		for (var i = 0; i < this.vecLetters.length; i++) {
 			// console.log(this.tempCounter);
-			this.vecLetters[i].setStyle({align:'center',font:'48px Vagron', fill:APP.vecColorsS[this.tempCounter], stroke:'#FFFFFF', strokeThickness:5});
-			// this.vecLetters[i].setStyle({align:'center',font:'48px Vagron', fill:APP.vecColorsS[this.tempCounter]});//, stroke:'#FFFFFF', strokeThickness:3});
-			this.tempCounter = Math.floor(Math.random() * APP.vecColorsS.length);
-			if(this.tempCounter >= APP.vecColorsS.length){
-				this.tempCounter = 0;
+			this.vecLetters[i].position.y = Math.sin(this.vecLetters[i].sin += 0.25) * 10;
+			if(changeColors || Math.random() < 0.05){
+				this.tempCounter ++;//Math.floor(Math.random() * APP.vecColorsS.length);
+				if(this.tempCounter >= APP.vecColorsS.length){
+					this.tempCounter = 0;
+				}
+				this.vecLetters[i].setStyle({align:'center',font:'48px Vagron', fill:APP.vecColorsS[this.tempCounter], stroke:'#FFFFFF', strokeThickness:5});
 			}
+			// this.vecLetters[i].setStyle({align:'center',font:'48px Vagron', fill:APP.vecColorsS[this.tempCounter]});//, stroke:'#FFFFFF', strokeThickness:3});
 		}
 	},
 });
